@@ -1,13 +1,25 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import { BrowserRouter } from 'react-router-dom'
+// Importing React's StrictMode, which helps with highlighting potential issues in the app
+import { StrictMode } from 'react';
 
+// Importing React's new createRoot API to manage the React app's rendering
+import { createRoot } from 'react-dom/client';
+
+// Importing the main App component, which contains the structure of your application
+import App from './App.jsx';
+
+// Importing global styles from the index.css file
+import './index.css';
+
+// Importing BrowserRouter from react-router-dom to handle routing in the app
+import { BrowserRouter } from 'react-router-dom';
+
+// Rendering the root element of the React app into the 'root' DOM element
 createRoot(document.getElementById('root')).render(
+  // Wrapping the app in StrictMode to check for potential problems
   <StrictMode>
+    {/* Wrapping the app with BrowserRouter to enable routing in the app */}
     <BrowserRouter>
-      <App />
+      <App /> {/* The main App component that contains the app's layout and routes */}
     </BrowserRouter>
   </StrictMode>,
 );

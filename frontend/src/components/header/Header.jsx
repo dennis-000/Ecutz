@@ -1,117 +1,124 @@
+// Importing necessary React hooks and libraries
 import { useEffect, useRef } from 'react'
-// ============= Logo importation
+// Importing the logo image
 import logo from "../../assets/images/ecutz.png";
-// ===============Image importation --- Profile
+// Importing the user profile image
 import userImg from '../../assets/images/avatar-icon.png';
 
+// Importing React Router components for navigation
 import { NavLink, Link } from "react-router-dom";
+// Importing an icon (menu icon for mobile view)
 import { BiMenu } from 'react-icons/bi';
+// ===============================
+// ===============================
 
 
-// ========== CODDED ========
-// Nav Path Links
+
+
+// Defining an array of navigation links with their paths and display names
 const navLinks = [
   {
-    path: '/home',
-    display: 'Home'
+    path: '/home',        // Link path to Home page
+    display: 'Home'       // Display name for the Home page link
   },
   {
-    path: '/barbers',
-    display: 'Find a Barber'
+    path: '/barbers',     // Link path to 'Find a Barber' page
+    display: 'Find a Barber'   // Display name for the 'Find a Barber' page link
   },
   {
-    path: '/services',
-    display: 'Services'
+    path: '/services',    // Link path to Services page
+    display: 'Services'   // Display name for the Services page link
   },
   {
-    path: '/contact',
-    display: 'Contact'
+    path: '/contact',     // Link path to Contact page
+    display: 'Contact'    // Display name for the Contact page link
   },
-  
 ]
 
-
+// Main Header component
 const Header = () => {
-  const headerRef = useRef(null)
-  const menuRef = useRef(null)
+  const headerRef = useRef(null)  // Reference to the header element
+  const menuRef = useRef(null)    // Reference to the navigation menu (used for mobile view)
 
-
-
+  // Function to add 'sticky' class to the header when scrolling past 80px
   const handleStickyHeader = () => {
     window.addEventListener('scroll', () => {
       if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-        headerRef.current.classList.add('sticky__header')
+        headerRef.current.classList.add('sticky__header')   // Add sticky class when scroll position is greater than 80px
       } else {
-        headerRef.current.classList.remove('sticky__header')
+        headerRef.current.classList.remove('sticky__header')  // Remove sticky class otherwise
       }
     })
   }
   
+  // useEffect hook to call handleStickyHeader when component mounts
   useEffect(() => {
     handleStickyHeader();
 
+    // Cleanup function to remove the scroll event listener when the component unmounts
     return () => window.removeEventListener('scroll', handleStickyHeader)
   });
 
-  const toggleMenu = ()=> menuRef.current.classList.toggle('show__menu')
+  // Function to toggle the visibility of the menu (for mobile view)
+  const toggleMenu = () => menuRef.current.classList.toggle('show__menu')
 
   return (
-    <header className="header flex items-center" ref={headerRef}>
+    <header className="header flex items-center" ref={headerRef}>  {/* Header with a reference */}
       <div className="container">
-        <div className="flex items-center justify justify-between">
-      {/* ========= logo =========== */}
+        <div className="flex items-center justify-between">
+          {/* Logo section */}
           <div>
-            <img src={logo} alt="Ecutz Logo" style={{ width: '70px', height: '70px' }} />
+            <img src={logo} alt="Ecutz Logo" style={{ width: '70px', height: '70px' }} />  {/* Logo image with fixed width/height */}
           </div>
 
-
-          {/* ========= MENU  ========= */}
+          {/* Navigation menu section */}
           <div className="navigation" ref={menuRef} onClick={toggleMenu}>
-            <ul className='menu flex items-center gap-[2.7rem]'>
-              {/* Addin all the necessary attributes here to modify the  the nav bar */}
+            <ul className='menu flex items-center gap-[2.7rem]'>  {/* Unordered list of navigation links */}
+              {/* Map over navLinks array to create list items for each link */}
               {
-                navLinks.map((link, index) =><li key={index}>
-                  <NavLink to={link.path} className={navClass => navClass.isActive
-                    ? 'text-primaryColor text-[16px] leading-7 font-[600]'
-                    : 'text-textColor text-[16px] leading-7 font-[500] hover:text-primaryColor'
-                  }
-                  >
-                    {link.display}
-                  </NavLink>
-                </li>
-                )}
+                navLinks.map((link, index) => 
+                  <li key={index}>
+                    <NavLink 
+                      to={link.path} 
+                      className={navClass => navClass.isActive
+                        ? 'text-primaryColor text-[16px] leading-7 font-[600]'  // Active link styling
+                        : 'text-textColor text-[16px] leading-7 font-[500] hover:text-primaryColor'  // Default link styling
+                      }
+                    >
+                      {link.display}  {/* Display link name */}
+                    </NavLink>
+                  </li>
+                )
+              }
             </ul>
           </div>
          
-          {/* =========== nav right ============ */}
+          {/* Right section (User profile and login button) */}
           <div className='flex items-center gap-4'>
             <div className='hidden'>
               <Link to='/'>
-                {/* User Profile Picture --- with it's styling */}
+                {/* Profile picture of the user */}
                 <figure className='w-[35px] rounded-full cursor-pointer'>
-                  <img src={userImg} className="w-full rounded-full" alt="The User Image" />
+                  <img src={userImg} className="w-full rounded-full" alt="The User Image" />  {/* User profile image */}
                 </figure>
               </Link>
             </div>
 
-            
-{/* =============== Login Button ================ */}
+            {/* Login button */}
             <Link to='/login'>
               <button className='bg-primaryColor py-6 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px]'>
-                Login
+                Login  {/* Button text */}
               </button>
             </Link>
-        {/* ========== Nav Image =======  */}
+
+            {/* Menu icon for mobile view */}
             <span className='md:hidden' onClick={toggleMenu}>
-              <BiMenu className='w-6 h-6 cursor-pointer'/>
+              <BiMenu className='w-6 h-6 cursor-pointer'/>  {/* Menu icon */}
             </span>
-
-
           </div>
-
         </div>
       </div>
-  </header>
+    </header>
   );
 };
 

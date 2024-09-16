@@ -1,45 +1,79 @@
-            @tailwind base;
-            @tailwind components;
-            @tailwind utilities;
-            @layer base {
-                section {
-                    @apply py-[75px]
-                }
-            }
-            
-            @layer components {
-                .container {
-                    @apply max-w-full w-[1440] px-5 mx-auto;
-                }
-                .btn {
-                    @apply bg-primaryColor py[15px] px-[35px] rounded-[50px] text-white font-[600] mt-[38px];
-                }
-                .heading {
-                    @apply text-[44px] leading-[54px] font-[700] text-headingColor;
-                }
-                .text__para {
-                    @apply text-[18px] leading-[30px] font-[400] text-textColor mt-[18px];
-                }
-                /* styling fo the bg header...with style size and so on... */
-                .header {
-                    @apply bg-[url('./assets/images/mask.png')] bg-no-repeat bg-center bg-cover w-full h-[100px] leading-[100px];
-                }
-            }
-            
-            @media only screen and (max-width:1024px) {
-                .container {
-                    @apply w-full;
-                }
-                section {
-                    @apply py-[35px];
-                }
-            }
-            
-            @media only screen and (max-width: 768px) {
-                .heading {
-                    @apply text-[26px] leading-[36px];
-                }
-                .text__para {
-                    @apply text-[16px] leading-7 mt-3;
-                }
-            }
+/* Importing Tailwind's base styles (reset and default styles) */
+
+@tailwind base;
+
+/* Importing Tailwind's component classes (for creating reusable components) */
+
+@tailwind components;
+
+/* Importing Tailwind's utility classes (single-purpose helper classes) */
+
+@tailwind utilities;
+
+/* Base layer: Styling for the section tag globally */
+
+@layer base {
+    section {
+        @apply py-[75px];
+        /* Applying padding of 75px on the top and bottom */
+    }
+}
+
+
+/* Components layer: Defining reusable component styles */
+
+@layer components {
+    /* Container component for layout with full width, specific max-width, and padding */
+    .container {
+        @apply max-w-full w-[1440px] px-5 mx-auto;
+        /* Max width of 1440px, horizontal padding of 5, centered with margin auto */
+    }
+    /* Button component styling */
+    .btn {
+        @apply bg-primaryColor py-[15px] px-[35px] rounded-[50px] text-white font-[600] mt-[38px];
+        /* Background color, padding, rounded corners, white text, bold font, margin-top */
+    }
+    /* Heading component styling */
+    .heading {
+        @apply text-[44px] leading-[54px] font-[700] text-headingColor;
+        /* Large font size, line height, bold, heading color */
+    }
+    /* Paragraph text styling */
+    .text__para {
+        @apply text-[18px] leading-[30px] font-[400] text-textColor mt-[18px];
+        /* Medium font size, line height, normal weight, text color, and margin-top */
+    }
+    /* Background styling for the header with a background image */
+    .header {
+        @apply bg-[url('./assets/images/mask.png')] bg-no-repeat bg-center bg-cover w-full h-[100px] leading-[100px];
+        /* Background image centered and covering full area, full width, height of 100px, and line-height for vertical centering */
+    }
+}
+
+
+/* Responsive design: Media queries for screen sizes below 1024px (tablets) */
+
+@media only screen and (max-width:1024px) {
+    .container {
+        @apply w-full;
+        /* Setting the container to full width */
+    }
+    section {
+        @apply py-[35px];
+        /* Reducing padding in sections to 35px for smaller screens */
+    }
+}
+
+
+/* Responsive design: Media queries for screen sizes below 768px (mobile devices) */
+
+@media only screen and (max-width: 768px) {
+    .heading {
+        @apply text-[26px] leading-[36px];
+        /* Smaller font size and line-height for headings on mobile devices */
+    }
+    .text__para {
+        @apply text-[16px] leading-7 mt-3;
+        /* Adjusted font size and line-height for paragraph text, with reduced margin-top */
+    }
+}
