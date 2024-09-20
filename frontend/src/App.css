@@ -42,6 +42,7 @@ body {
     /* High z-index to ensure the header stays on top of other elements */
     box-shadow: 3px 3px -8px 3px #ddd;
     /* Adds a shadow for depth */
+    /* background: white; */
 }
 
 

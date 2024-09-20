@@ -1,7 +1,18 @@
 import React from 'react';
 import heroImg01 from '../assets/images/4.jpg';
 import heroImg02 from '../assets/images/2.jpg';
-import heroImg03 from '../assets/images/hero-img03.png';
+import heroImg03 from '../assets/images/3.jpg';
+import featureImg from '../assets/images/feature-img.png'
+import videoIcon from '../assets/images/video-icon.png'
+import avatarIcon from '../assets/images/avatar-icon.png'
+import icon01 from '../assets/images/icon01.png'
+import icon02 from '../assets/images/icon02.png'
+import icon03 from '../assets/images/icon03.png'
+import { Link } from 'react-router-dom';
+import { BsArrowRight } from 'react-icons/bs';
+import About from '../components/About/about';
+import ServiceList from '../components/Services/ServiceList';
+import BarberList from '../components/Barbers/BarberList';
 
 const Home = () => {
   return <>
@@ -9,17 +20,19 @@ const Home = () => {
     <section className='hero__section pt-[60px] 2xl:h-[800px]'>
       <div className="container">
         <div className='flex flex-col lg:flex-row gap-[90px] items-center justify-between'>
+
           {/* =========== Home Page CONTENTS ========== */}
           <div>
             <div className='lg:w-[570px]'>
               <h1 className='text[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] 
               md:leading-[70px]'>
-                Looking for appointment with a local hairstylist
+                Need an Appointment with a Local Barber or Stylist?
               </h1>
-              <p className='text_para'>Lorem ipsum dolor sit amet, consectetur
-                adipisicing elit. A impedit, dolore aliquid aliquam ex omnis accusamus eum
-                ducimus sint illum adipisci laudantium. Fugit dignissimos ad consectetur exercitationem. Quaerat,
-                ipsam commodi.</p>
+              <p className='text_para'>Ecutz is your go-to platform for all your hair grooming needs at the University of Ghana.
+                Whether you’re looking for a fresh haircut, beard grooming, or stylish hairdos, our professional barbers and stylists
+                are here to cater to both men and women. Enjoy expert grooming services with the convenience of booking online
+                and getting styled right on campus.
+              </p>
             </div>
             {/* Home btn */}
             <button className='btn'>Request an Appointment</button>
@@ -28,11 +41,11 @@ const Home = () => {
           {/* =========== Home Page CONTENTS Image ========== */}
           <div className='flex gap-[30px] justify-end'>
             <div>
-              <img className='w-[600px] h-[600px] ' src={heroImg01} alt="Fisrt content Image" />
+              <img className='w-[250px] h-[400px] rounded-3xl' src={heroImg01} alt="Fisrt content Image" />
             </div>
             <div className='mt-[30px]'>
-              <img src={heroImg02} alt="Second Img" className='w-[200px] h-[150px] mb-[30px]' />
-              <img src={heroImg03} alt="Third Img" className='w-full'/>
+              <img src={heroImg02} alt="Second Img" className='w-[200px] h-[170px] mb-[30px] rounded-lg' />
+              <img src={heroImg03} alt="Third Img" className='w-[200px] h-[150px] mb-[30px] rounded-lg'/>
             </div>
           </div>
         </div>
@@ -76,16 +89,214 @@ const Home = () => {
     </section>
     {/* ==================== Hero Section End =================== */}
 
-    {/* =========================================== */}
+    {/* =================== New Section Container======================== */}
     <section>
       <div className="container">
         <div className='lg:w-[470px] mx-auto'>
           <h2 className='heading text-center'>Providing the Best Hair Styling Services
           </h2>
+          <p className='text__para text-center'>First-Class Barbers and hair Stylists. View profiles and choose your favorite barber. 
+          </p>
+        </div>
+
+        
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-[30px] mt-[30px] 
+        lg:mt-[55px]'>
+
+
+          {/* ======= First Illustration ======== */}
+            <div className='py-[30px] px-5'>
+              <div className='flex items-center justify-center'>
+                <img src={icon01} alt="" />
+            </div>
+            
+            <div className='mt-[30px]'>
+              <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>
+                Find a Stylist Or Barber
+              </h2>
+              <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>
+                Discover skilled hair stylists and barbers at the University of Ghana. Ecutz allows you to explore profiles,
+                view ratings, and choose your ideal professional.
+              </p>
+
+              <Link to='/barbers' className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] mt-[30px] mx-auto 
+              flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
+                <BsArrowRight className='group-hover:text-white w-6 h-5'/>
+              </Link>
+            </div>
+          </div>
+
+
+          {/* ======= Second Illustration ======== */}
+            <div className='py-[30px] px-5'>
+              <div className='flex items-center justify-center'>
+                <img src={icon02} alt="" />
+            </div>
+            
+            <div className='mt-[30px]'>
+              <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>
+                Find a Location
+              </h2>
+              <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>
+                Locate your favorite barbers on campus with Ecutz. Use our map to find barbers near you, check their availability,
+                and book a convenient time for your haircut.
+              </p>
+              <Link to='/barbers' className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] mt-[30px] mx-auto 
+              flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
+                <BsArrowRight className='group-hover:text-white w-6 h-5'/>
+              </Link>
+            </div>
+          </div>
+
+
+          {/* ======= Third Illustration ======== */}
+            <div className='py-[30px] px-5'>
+              <div className='flex items-center justify-center'>
+                <img src={icon03} alt="" />
+            </div>
+            
+            <div className='mt-[30px]'>
+              <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>
+                Book Appointment
+              </h2>
+              <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>
+                Scheduling your next haircut is simple with Ecutz. Browse hair stylists and barbers, choose a service, select a time,
+                and confirm your appointment—all in a few clicks.
+              </p>
+              <Link to='/barbers' className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] mt-[30px] mx-auto 
+              flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
+                <BsArrowRight className='group-hover:text-white w-6 h-5'/>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
+    {/* ===== End Of the New Section Container */}
 
+
+    {/* ======== About Section Begin ========== */}
+    <About/>
+    {/* ======== About Section End ========== */}
+
+
+    {/* ======== Services Section Start ========== */}
+    <section>
+      <div className="container">
+        <div className='xl:w-[470] mx-auto'>
+          <h2 className='heading text-center'>Styling and Babering Services</h2>
+          <p className='text__para text-center'>
+            Ecutz provides on-campus haircuts, trims, beard grooming, and styling.
+            Enjoy quick, quality service.
+          </p> 
+        </div>
+
+      <ServiceList/>
+      </div>
+</section>
+    {/* ======== Services Section End ========== */}
+
+    
+    {/* ======== Feature Section ========= */}
+    <section>
+      <div className='container'>
+        <div className='flex items-center justify-between flex-col lg:flex-row'>
+
+          {/* ====== feature content ====== */}
+          <div className='xl:w-[670px]'>
+            <h2 className='heading'>
+              Best Grooming Services <br /> Anytime, Anywhere
+            </h2>
+            <ul className="pl-4">
+              <li className="text__para">
+                1. Book your appointment directly with just a few clicks.
+              </li>
+              <li className="text__para">
+                2. Explore and connect with professional barbers available on campus.
+              </li>
+              <li className="text__para">
+                3. Browse our barbers and stylists, view their availability, and
+                choose a time that fits your schedule.
+              </li> 
+            </ul>
+
+            <Link to='/'>
+              <button className='btn'>Learn More</button>
+            </Link>
+          </div>
+
+
+          {/* ============ feature Image ========== */}
+          <div className='relative z-10 xl:w-[770px] flex justify-end mt-[50px] lg:mt-0'>
+            <img src={featureImg} className='w-3/4' alt="The Feature Content Image" />
+
+            <div className='w-[150px] lg:w-[248px] bg-white absolute bottom-[50px] left-0 
+            md:bottom-[100px] md:left-5 z-20 p-2 pb-3 lg:pt-4 lg:px-4 lg:pb-[26px] rounded-[10px]'>
+
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-[6px] lg:gap-3'>
+                  {/* ==== Example Appoint Date */}
+                  <p className='text-[10px] leading-[10px] lg:text-[14px] lg:leading-5 text-textColor
+                  font-[400]'>Tues, 24
+                  </p>
+                  <p className='text-[10px] leading-[10px] lg:text-[14px] lg:leading-5 text-textColor
+                  font-[400]'>10:00AM
+                  </p>
+                </div>
+                <span className='w-5 h-5 lg:w-[34px] lg:h-[34px] flex items-center justify-center
+                bg-yellowColor rounded py-1 px-[6px] lg:py-3 lg:px-[9px]'>
+                  <img src={videoIcon} alt="Small Video Icon" />
+                </span>
+              </div>
+
+              {/* ============= Styled Small Text ================= */}
+              <div className='w-[75px] lg:w-[96px] bg-[#CCF0F3] py-1 px-2 lg:py-[6px] lg:px-[10px]
+              text-[8px] leading-[8px] lg:text-[12px] lg:leading-4 text-irisBlueColor font-[800] mt-2 lg:mt-4
+              rounded-s-full'>
+                Professional
+              </div>
+
+            {/* ======= small Profile Icon Image */}
+              <div className='flex items-center gap-[6px] lg:gap-[10px] mt-2 lg:mt-[18px]'>
+                <img src={avatarIcon} alt="Profile Avartar Icon" />
+                <h4 className='text-[10px] leading-3 lg:text-[16px] lg:leading-[22px] font-[700] text-headingColor'>
+                  Saddiq Ahmed
+                </h4>
+              </div>
+
+
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </section>
+
+    {/* ============= Feature Section ============== */}
+    {/* ============= High Rated OR Recommended Barbers Section START ============== */}
+    <section>
+      <div className="container">
+          <div className='xl:w-[470] mx-auto'>
+          <h2 className='heading text-center'>Recommended</h2>
+          <p className='text__para text-center'>
+            Discover top-rated barbers on campus for expert haircuts, trims, and beard grooming.
+            Book now for quality service tailored to your style.
+          </p> 
+        </div>
+        <BarberList/>
+      </div>
+    </section>
+    {/* ============= High Rated OR Recommended Barbers Section END ============== */}
+
+
+    
+    {/* ================== faqs SECTION START ==================*/}
+    <section>
+
+    </section>
+    {/* ================== faqs SECTION END ==================*/}
   </>
 }
 
