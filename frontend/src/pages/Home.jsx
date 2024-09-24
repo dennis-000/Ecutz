@@ -26,10 +26,12 @@ const Home = () => {
           {/* =========== Home Page CONTENTS ========== */}
           <div>
             <div className='lg:w-[570px]'>
-              <h1 className='text[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] 
-              md:leading-[70px]'>
-                Need an Appointment with a Local Barber or Stylist?
-              </h1>
+              
+
+              <h1 className='text-[24px] leading-[34px] text-headingColor font-[800] md:text-[36px] md:leading-[46px] lg:text-[60px] lg:leading-[70px]'>
+                  Need an Appointment with a Local Barber or Stylist?
+                </h1>
+
               <p className='text_para'>Ecutz is your go-to platform for expert grooming at the University
                 of Ghana. From haircuts to beard grooming for men, and stylish hairdos by professional hair stylists
                 for women, we offer convenient on-campus services with easy online booking.
@@ -40,7 +42,40 @@ const Home = () => {
           </div>
 
           {/* =========== Home Page CONTENTS Image ========== */}
-          <div className='flex gap-[30px] justify-end'>
+<div className='flex flex-wrap gap-[20px] justify-center md:justify-end'>
+  {/* 'flex-wrap' allows the images to wrap if they can't fit on smaller screens. 
+      'gap-[20px]' reduces the gap a bit for smaller screens.
+      'justify-center' centers the images on small screens, 'md:justify-end' aligns them to the right on medium and larger screens. */}
+  
+  <div>
+              <img className='w-[150px] h-[250px] sm:w-[200px] sm:h-[300px] md:w-[250px] md:h-[400px] 
+    rounded-3xl' src={heroImg01} alt="First content Image" />
+    {/* Responsive image sizing: 
+        - On small screens (sm), it will scale to width 200px, height 300px.
+        - On medium screens (md), it will use 250px width and 400px height (original size).
+        - On extra-small screens, it shrinks to 150px width and 250px height. */}
+  </div>
+
+  <div className='mt-[20px] sm:mt-[30px]'>
+    {/* Adjust top margin to be smaller on very small screens for better spacing. */}
+    
+              <img src={heroImg02} alt="Second Img" className='w-[150px] h-[120px] sm:w-[175px] sm:h-[150px] 
+    md:w-[200px] md:h-[170px] mb-[20px] rounded-lg' />
+    {/* Second image: 
+        - Shrinks to 150px wide and 120px tall on very small screens.
+        - Scales to 175px by 150px on small screens.
+        - Reverts to 200px by 170px on medium screens and larger. */}
+    
+              <img src={heroImg03} alt="Third Img" className='w-[150px] h-[100px] sm:w-[175px] sm:h-[130px] md:w-[200px] 
+    md:h-[150px] rounded-lg'/>
+    {/* Third image:
+        - Shrinks to 150px wide and 100px tall on very small screens.
+        - Grows to 175px by 130px on small screens.
+        - Reverts to 200px by 150px on medium and larger screens. */}
+  </div>
+
+            
+         {/* <div className='flex gap-[30px] justify-end'>
             <div>
               <img className='w-[250px] h-[400px] rounded-3xl' src={heroImg01} alt="Fisrt content Image" />
             </div>
@@ -48,7 +83,9 @@ const Home = () => {
               <img src={heroImg02} alt="Second Img" className='w-[200px] h-[170px] mb-[30px] rounded-lg' />
               <img src={heroImg03} alt="Third Img" className='w-[200px] h-[150px] mb-[30px] rounded-lg'/>
             </div>
-          </div>
+          </div> */}
+</div>
+
         </div>
 
 

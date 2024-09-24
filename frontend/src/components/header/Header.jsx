@@ -64,6 +64,7 @@ const Header = () => {
 
   return (
     <header className="header flex items-center" ref={headerRef}>  {/* Header with a reference */}
+      
       <div className="container">
         <div className="flex items-center justify-between">
           {/* Logo section */}
@@ -72,7 +73,7 @@ const Header = () => {
           </div>
 
           {/* Navigation menu section */}
-          <div className="navigation" ref={menuRef} onClick={toggleMenu}>
+          < div className="navigation" ref={menuRef} onClick={toggleMenu}>
             <ul className='menu flex items-center gap-[2.7rem]'>  {/* Unordered list of navigation links */}
               {/* Map over navLinks array to create list items for each link */}
               {
@@ -91,6 +92,7 @@ const Header = () => {
                 )
               }
             </ul>
+            
           </div>
          
           {/* Right section (User profile and login button) */}
@@ -99,7 +101,8 @@ const Header = () => {
               <Link to='/'>
                 {/* Profile picture of the user */}
                 <figure className='w-[35px] rounded-full cursor-pointer'>
-                  <img src={userImg} className="w-full rounded-full" alt="The User Image" />  {/* User profile image */}
+                  {/* User profile image */}
+                  <img src={userImg} className="w-full rounded-full" alt="The User Image" />  
                 </figure>
               </Link>
             </div>
