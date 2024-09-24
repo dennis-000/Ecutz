@@ -1,18 +1,20 @@
-import React from 'react';
 import heroImg01 from '../assets/images/4.jpg';
 import heroImg02 from '../assets/images/2.jpg';
 import heroImg03 from '../assets/images/3.jpg';
-import featureImg from '../assets/images/feature-img.png'
+import featureImg from '../assets/images/feature-img1.jpg'
 import videoIcon from '../assets/images/video-icon.png'
 import avatarIcon from '../assets/images/avatar-icon.png'
 import icon01 from '../assets/images/icon01.png'
 import icon02 from '../assets/images/icon02.png'
 import icon03 from '../assets/images/icon03.png'
+import faqImg from '../assets/images/faq-img1.jpg';
 import { Link } from 'react-router-dom';
 import { BsArrowRight } from 'react-icons/bs';
 import About from '../components/About/about';
 import ServiceList from '../components/Services/ServiceList';
 import BarberList from '../components/Barbers/BarberList';
+import FaqList from '../components/faq/faqList';
+import Testimonial from'../components/Testimonial/Testimonial';
 
 const Home = () => {
   return <>
@@ -28,10 +30,9 @@ const Home = () => {
               md:leading-[70px]'>
                 Need an Appointment with a Local Barber or Stylist?
               </h1>
-              <p className='text_para'>Ecutz is your go-to platform for all your hair grooming needs at the University of Ghana.
-                Whether you’re looking for a fresh haircut, beard grooming, or stylish hairdos, our professional barbers and stylists
-                are here to cater to both men and women. Enjoy expert grooming services with the convenience of booking online
-                and getting styled right on campus.
+              <p className='text_para'>Ecutz is your go-to platform for expert grooming at the University
+                of Ghana. From haircuts to beard grooming for men, and stylish hairdos by professional hair stylists
+                for women, we offer convenient on-campus services with easy online booking.
               </p>
             </div>
             {/* Home btn */}
@@ -279,12 +280,13 @@ const Home = () => {
     <section>
       <div className="container">
           <div className='xl:w-[470] mx-auto'>
-          <h2 className='heading text-center'>Recommended</h2>
-          <p className='text__para text-center'>
-            Discover top-rated barbers on campus for expert haircuts, trims, and beard grooming.
-            Book now for quality service tailored to your style.
-          </p> 
+            <h2 className='heading text-center'>Recommended</h2>
+            <p className='text__para text-center'>
+              Discover top-rated barbers on campus for expert haircuts, trims, and beard grooming.
+              Book now for quality service tailored to your style.
+            </p> 
         </div>
+
         <BarberList/>
       </div>
     </section>
@@ -294,9 +296,39 @@ const Home = () => {
     
     {/* ================== faqs SECTION START ==================*/}
     <section>
+      <div className="container">
+        <div className='flex justify-between gap-[50px] lg:gap-0'>
+          <div className='w-[40%] hidden md:block'>
+            <img src={faqImg} alt="faq Image" />
+          </div>
+
+          <div className='w-full md:w-1/2'>
+            <h2 className='heading'>Most questions by our beloved customers</h2>
+            <FaqList/>
+
+          </div>
+
+
+        </div>
+      </div>
 
     </section>
     {/* ================== faqs SECTION END ==================*/}
+
+    {/* ================== Testimonial SECTION Start ==================*/}
+    <section>
+      <div className="container">
+        <div className='xl:w-[470] mx-auto'>
+            <h2 className='heading text-center'>What our clients say</h2>
+            <p className='text__para text-center'>
+            At Ecutz, we pride ourselves on delivering top-notch barbering
+            services to students right on campus.
+            </p> 
+        </div>
+        <Testimonial/>
+      </div>
+    </section>
+    {/* ================== Testimonial SECTION End ==================*/}
   </>
 }
 
