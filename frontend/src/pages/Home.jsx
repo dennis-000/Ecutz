@@ -1,18 +1,20 @@
-import React from 'react';
 import heroImg01 from '../assets/images/4.jpg';
 import heroImg02 from '../assets/images/2.jpg';
 import heroImg03 from '../assets/images/3.jpg';
-import featureImg from '../assets/images/feature-img.png'
+import featureImg from '../assets/images/feature-img1.jpg'
 import videoIcon from '../assets/images/video-icon.png'
 import avatarIcon from '../assets/images/avatar-icon.png'
 import icon01 from '../assets/images/icon01.png'
 import icon02 from '../assets/images/icon02.png'
 import icon03 from '../assets/images/icon03.png'
+import faqImg from '../assets/images/faq-img1.jpg';
 import { Link } from 'react-router-dom';
 import { BsArrowRight } from 'react-icons/bs';
 import About from '../components/About/about';
 import ServiceList from '../components/Services/ServiceList';
 import BarberList from '../components/Barbers/BarberList';
+import FaqList from '../components/faq/faqList';
+import Testimonial from'../components/Testimonial/Testimonial';
 
 const Home = () => {
   return <>
@@ -24,14 +26,15 @@ const Home = () => {
           {/* =========== Home Page CONTENTS ========== */}
           <div>
             <div className='lg:w-[570px]'>
-              <h1 className='text[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] 
-              md:leading-[70px]'>
-                Need an Appointment with a Local Barber or Stylist?
-              </h1>
-              <p className='text_para'>Ecutz is your go-to platform for all your hair grooming needs at the University of Ghana.
-                Whether you’re looking for a fresh haircut, beard grooming, or stylish hairdos, our professional barbers and stylists
-                are here to cater to both men and women. Enjoy expert grooming services with the convenience of booking online
-                and getting styled right on campus.
+              
+
+              <h1 className='text-[24px] leading-[34px] text-headingColor font-[800] md:text-[36px] md:leading-[46px] lg:text-[60px] lg:leading-[70px]'>
+                  Need an Appointment with a Local Barber or Stylist?
+                </h1>
+
+              <p className='text_para'>Ecutz is your go-to platform for expert grooming at the University
+                of Ghana. From haircuts to beard grooming for men, and stylish hairdos by professional hair stylists
+                for women, we offer convenient on-campus services with easy online booking.
               </p>
             </div>
             {/* Home btn */}
@@ -39,7 +42,40 @@ const Home = () => {
           </div>
 
           {/* =========== Home Page CONTENTS Image ========== */}
-          <div className='flex gap-[30px] justify-end'>
+<div className='flex flex-wrap gap-[20px] justify-center md:justify-end'>
+  {/* 'flex-wrap' allows the images to wrap if they can't fit on smaller screens. 
+      'gap-[20px]' reduces the gap a bit for smaller screens.
+      'justify-center' centers the images on small screens, 'md:justify-end' aligns them to the right on medium and larger screens. */}
+  
+  <div>
+              <img className='w-[150px] h-[250px] sm:w-[200px] sm:h-[300px] md:w-[250px] md:h-[400px] 
+    rounded-3xl' src={heroImg01} alt="First content Image" />
+    {/* Responsive image sizing: 
+        - On small screens (sm), it will scale to width 200px, height 300px.
+        - On medium screens (md), it will use 250px width and 400px height (original size).
+        - On extra-small screens, it shrinks to 150px width and 250px height. */}
+  </div>
+
+  <div className='mt-[20px] sm:mt-[30px]'>
+    {/* Adjust top margin to be smaller on very small screens for better spacing. */}
+    
+              <img src={heroImg02} alt="Second Img" className='w-[150px] h-[120px] sm:w-[175px] sm:h-[150px] 
+    md:w-[200px] md:h-[170px] mb-[20px] rounded-lg' />
+    {/* Second image: 
+        - Shrinks to 150px wide and 120px tall on very small screens.
+        - Scales to 175px by 150px on small screens.
+        - Reverts to 200px by 170px on medium screens and larger. */}
+    
+              <img src={heroImg03} alt="Third Img" className='w-[150px] h-[100px] sm:w-[175px] sm:h-[130px] md:w-[200px] 
+    md:h-[150px] rounded-lg'/>
+    {/* Third image:
+        - Shrinks to 150px wide and 100px tall on very small screens.
+        - Grows to 175px by 130px on small screens.
+        - Reverts to 200px by 150px on medium and larger screens. */}
+  </div>
+
+            
+         {/* <div className='flex gap-[30px] justify-end'>
             <div>
               <img className='w-[250px] h-[400px] rounded-3xl' src={heroImg01} alt="Fisrt content Image" />
             </div>
@@ -47,7 +83,9 @@ const Home = () => {
               <img src={heroImg02} alt="Second Img" className='w-[200px] h-[170px] mb-[30px] rounded-lg' />
               <img src={heroImg03} alt="Third Img" className='w-[200px] h-[150px] mb-[30px] rounded-lg'/>
             </div>
-          </div>
+          </div> */}
+</div>
+
         </div>
 
 
@@ -279,12 +317,13 @@ const Home = () => {
     <section>
       <div className="container">
           <div className='xl:w-[470] mx-auto'>
-          <h2 className='heading text-center'>Recommended</h2>
-          <p className='text__para text-center'>
-            Discover top-rated barbers on campus for expert haircuts, trims, and beard grooming.
-            Book now for quality service tailored to your style.
-          </p> 
+            <h2 className='heading text-center'>Recommended</h2>
+            <p className='text__para text-center'>
+              Discover top-rated barbers on campus for expert haircuts, trims, and beard grooming.
+              Book now for quality service tailored to your style.
+            </p> 
         </div>
+
         <BarberList/>
       </div>
     </section>
@@ -294,9 +333,39 @@ const Home = () => {
     
     {/* ================== faqs SECTION START ==================*/}
     <section>
+      <div className="container">
+        <div className='flex justify-between gap-[50px] lg:gap-0'>
+          <div className='w-[40%] hidden md:block'>
+            <img src={faqImg} alt="faq Image" />
+          </div>
+
+          <div className='w-full md:w-1/2'>
+            <h2 className='heading'>Most questions by our beloved customers</h2>
+            <FaqList/>
+
+          </div>
+
+
+        </div>
+      </div>
 
     </section>
     {/* ================== faqs SECTION END ==================*/}
+
+    {/* ================== Testimonial SECTION Start ==================*/}
+    <section>
+      <div className="container">
+        <div className='xl:w-[470] mx-auto'>
+            <h2 className='heading text-center'>What our clients say</h2>
+            <p className='text__para text-center'>
+            At Ecutz, we pride ourselves on delivering top-notch barbering
+            services to students right on campus.
+            </p> 
+        </div>
+        <Testimonial/>
+      </div>
+    </section>
+    {/* ================== Testimonial SECTION End ==================*/}
   </>
 }
 

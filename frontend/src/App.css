@@ -1,101 +1,126 @@
-/* Importing a Google Font called 'Manrope' with weights ranging from 200 to 800 */
-
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
-
-/* Applying a universal reset to remove margin and padding for all elements, 
+        /* Importing a Google Font called 'Manrope' with weights ranging from 200 to 800 */
+        
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+        /* Applying a universal reset to remove margin and padding for all elements, 
    and setting box-sizing to border-box for consistent sizing */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-
-/* Styling the body element with the 'Manrope' font as the primary font */
-
-body {
-    font-family: "Manrope", sans-serif;
-}
-
-
-/* Sticky header styling:
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Styling the body element with the 'Manrope' font as the primary font */
+        
+        body {
+            font-family: "Manrope", sans-serif;
+        }
+        
+        .swiper-pagination-bullet {
+            width: 12px !important;
+            height: 12px !important;
+            border: 1px solid #181a1e !important;
+            opacity: 100% !important;
+            background: #fff !important;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: #0067ff !important;
+            border: none !important;
+        }
+        
+        .swiper {
+            padding-bottom: 70px !important;
+        }
+        
+        .swiper-slide.swiper-slide-next {
+            background: #0067ff;
+            border-radius: 12px;
+            box-shadow: 0px 20px 70px rgba(0, 103, 255, 0.3) !important;
+        }
+        
+        .swiper-slide.swiper-slide-next h4,
+        .swiper-slide.swiper-slide-next p {
+            color: #fff !important;
+        }
+        
+        .swiper-pagination {
+            top: 90% !important;
+        }
+        /* Sticky header styling:
    - The header will stick to the top of the page when scrolling.
    - Box shadow adds a subtle 3D effect.
    - Position is 'sticky' to keep it fixed once it reaches the top of the viewport.
    - The z-index ensures it stays above other content. */
-
-.sticky__header {
-    width: 100px;
-    /* Width of the header (seems small for a header; adjust if necessary) */
-    height: 80px;
-    /* Height of the header */
-    line-height: 80px;
-    /* Ensures content inside the header is vertically centered */
-    position: sticky;
-    /* Makes the header stick to the top of the viewport when scrolling */
-    top: 0;
-    /* Positioning at the top */
-    left: 0;
-    /* Aligning to the left */
-    z-index: 99999;
-    /* High z-index to ensure the header stays on top of other elements */
-    box-shadow: 3px 3px -8px 3px #ddd;
-    /* Adds a shadow for depth */
-    /* background: white; */
-}
-
-
-/* Media query for screens that are 768px wide or less (typically tablets and mobile devices) */
-
-@media only screen and (max-width:768px) {
-    /* Styling for the navigation menu in mobile view */
-    .navigation {
-        width: 100%;
-        /* Full screen width */
-        height: 100%;
-        /* Full screen height */
-        position: fixed;
-        /* Fixing the navigation to the viewport */
-        top: 0;
-        /* Aligning to the top */
-        left: 0;
-        /* Aligning to the left */
-        z-index: 100;
-        /* Ensures it sits above most elements */
-        background: #00000084;
-        /* A semi-transparent black background */
-        display: none;
-        /* Initially hidden; it will be shown when the menu is toggled */
-    }
-    /* Styling for the menu list in mobile view */
-    .menu {
-        width: 15rem;
-        /* Fixed width of the menu (15rem units) */
-        height: 100%;
-        /* Full screen height */
-        position: absolute;
-        /* Positioned relative to the navigation */
-        top: 0;
-        /* Aligning to the top */
-        right: 0;
-        /* Aligning to the right */
-        background: #fff;
-        /* White background for the menu */
-        z-index: 200;
-        /* Higher z-index to ensure it's above the navigation background */
-        flex-direction: column;
-        /* Stacking the menu items vertically */
-        justify-content: center;
-        /* Centering menu items vertically */
-        align-items: center;
-        /* Centering menu items horizontally */
-        line-height: 30px;
-        /* Space between menu items */
-    }
-    /* Class to show the menu when toggled (in mobile view) */
-    .show__menu {
-        display: block;
-        /* Changes the display from 'none' to 'block' */
-    }
-}
+        
+        .sticky__header {
+            width: 100px;
+            /* Width of the header (seems small for a header; adjust if necessary) */
+            height: 80px;
+            /* Height of the header */
+            line-height: 80px;
+            /* Ensures content inside the header is vertically centered */
+            position: sticky;
+            /* Makes the header stick to the top of the viewport when scrolling */
+            top: 0;
+            /* Positioning at the top */
+            left: 0;
+            /* Aligning to the left */
+            z-index: 99999;
+            /* High z-index to ensure the header stays on top of other elements */
+            box-shadow: 3px 3px -8px 3px #ddd;
+            /* Adds a shadow for depth */
+            /* background: white; */
+        }
+        /* Media query for screens that are 768px wide or less (typically tablets and mobile devices) */
+        
+        @media only screen and (max-width:768px) {
+            /* Styling for the navigation menu in mobile view */
+            .navigation {
+                width: 100%;
+                /* Full screen width */
+                height: 100%;
+                /* Full screen height */
+                position: fixed;
+                /* Fixing the navigation to the viewport */
+                top: 0;
+                /* Aligning to the top */
+                left: 0;
+                /* Aligning to the left */
+                z-index: 100;
+                /* Ensures it sits above most elements */
+                background: #00000084;
+                /* A semi-transparent black background */
+                display: none;
+                /* Initially hidden; it will be shown when the menu is toggled */
+            }
+            /* Styling for the menu list in mobile view */
+            .menu {
+                width: 15rem;
+                /* Fixed width of the menu (15rem units) */
+                height: 100%;
+                /* Full screen height */
+                position: absolute;
+                /* Positioned relative to the navigation */
+                top: 0;
+                /* Aligning to the top */
+                right: 0;
+                /* Aligning to the right */
+                background: #fff;
+                /* White background for the menu */
+                z-index: 200;
+                /* Higher z-index to ensure it's above the navigation background */
+                flex-direction: column;
+                /* Stacking the menu items vertically */
+                justify-content: center;
+                /* Centering menu items vertically */
+                align-items: center;
+                /* Centering menu items horizontally */
+                line-height: 30px;
+                /* Space between menu items */
+            }
+            /* Class to show the menu when toggled (in mobile view) */
+            .show__menu {
+                display: block;
+                /* Changes the display from 'none' to 'block' */
+            }
+        }
