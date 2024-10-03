@@ -10,7 +10,7 @@ const socialLinks = [
     icon: <AiFillYoutube className='group-hover:text-white w-4 h-5' />,
   },
   {
-    path: "#",
+    path: "https://www.instagram.com/ecutzhairsaloon?igsh=NXR3NTAyaTJqMmNr&utm_source=qr",
     icon: <AiOutlineInstagram className='group-hover:text-white w-4 h-5' />,
   },
   {

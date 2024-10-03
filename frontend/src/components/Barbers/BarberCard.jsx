@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // Importing assets and components
 import starIcon from '../../assets/images/Star.png'; // Importing the star icon image
 import { Link } from 'react-router-dom'; // Importing Link for navigation
@@ -54,7 +55,7 @@ const BarberCard = ({ barber }) => {
                 </div>
 
                 <Link
-                    to='/barbers' // Link to navigate to the barbers page
+                    to={barber.id} // Link to navigate to the barbers page
                     className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E]
                     flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
                     

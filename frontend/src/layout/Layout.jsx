@@ -1,5 +1,4 @@
 // Importing necessary libraries and components
-import React from 'react'
 
 import Header from '../components/header/Header';  // Importing the Header component
 import Footer from '../components/footer/Footer';  // Importing the Footer component
