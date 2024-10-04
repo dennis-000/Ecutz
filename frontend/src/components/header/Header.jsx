@@ -33,6 +33,10 @@ const navLinks = [
     path: '/contact',     // Link path to Contact page
     display: 'Contact'    // Display name for the Contact page link
   },
+  {
+    path: 'aboutus',
+    display: 'About Us'
+  },
 ]
 
 // Main Header component

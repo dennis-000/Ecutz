@@ -46,6 +46,15 @@
                 @apply bg-[url('./assets/images/mask.png')] bg-no-repeat bg-center bg-cover w-full h-[100px] leading-[100px] backdrop-blur-lg;
                 /* Background image centered and covering full area, full width, height of 100px, and line-height for vertical centering */
             }
+            .form__label {
+                @apply text-textColor font-semibold text-[16px] mb-2;
+            }
+            .form__input {
+                @apply w-full px-4 py-3 border border-solid border-[#0066ff61] text-[16px] leading-7 text-headingColor cursor-pointer rounded-md;
+            }
+            .form__input::placeholder {
+                @apply text-textColor;
+            }
         }
         /* Responsive design: Media queries for screen sizes below 1024px (tablets) */
         
