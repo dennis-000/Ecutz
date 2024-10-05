@@ -1,17 +1,16 @@
-import aboutImg from '../../assets/images/ecutz.png';
-import aboutCardimg from '../../assets/images/about-card1.png';
+
+import aboutImg from '../assets/images/ecutz.png';
+import aboutCardimg from '../assets/images/about-card1.png';
 import { Link } from 'react-router-dom';
 
-
-// Functional component for the About section
-function About() {
-    return <section>
+    function Aboutus() {
+        return <section>
         <div className="container">
             <div className='flex justify-between gap-[50px] lg:gap-[130px] xl:gap-0 flex-col lg:flex-row'>
                 {/* ============= ABOUT IMAGE ========= */}
                 <div className='relative w-3/4 lg:w-1/2 xl:w-[550px] z-10 order-1 lg:order-2'>
                     <img src={aboutImg} alt="About Ecutz Image" />
-                    <div className='absolute z-20 bottom-4 w-[200px] md:w-[300px] right-[-30%] md:right-[-7%] lg:right-[-6%]'>
+                    <div className='absolute z-20 bottom-4 w-[200px] md:w-[300px] right-[-30%] md:right-[-7%] lg:right-[-22%]'>
                         <img src={aboutCardimg} alt="Card Testimonial" />
                     </div>
                 </div>
@@ -37,11 +36,22 @@ function About() {
                         <button className='btn'>Learn More</button>
                     </Link>
                 </div>
+            </div>  
             </div>
             
-      </div>
+
+            <div className="container">
+                <div className='flex justify-end gap-[50px] lg:gap-[130px] xl:gap-0 flex-col lg:flex-row'>
+                {/* ============= ABOUT IMAGE ========= */}
+                    <div className='relative w-3/4 lg:w-1/2 xl:w-[550px] z-10 order-1 lg:order-2'>
+                        <img src={aboutImg} alt="About Ecutz Image" />
+                        {/* <div className='absolute z-20 bottom-4 w-[200px] md:w-[300px] right-[-30%] md:right-[-7%] lg:right-[-22%]'>
+                            <img src={aboutCardimg} alt="Card Testimonial" />
+                        </div> */}
+                    </div>
+                </div>
+            </div>
   </section>
 };
 
-//  Will be Exporting the About component for use in other parts of the application
-export default About
+export default Aboutus

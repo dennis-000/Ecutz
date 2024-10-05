@@ -4,6 +4,9 @@ import doctorImg from '../../assets/images/doctor-img02.png'
 import BarberAbout from './BarberAbout';
 import Feedback from './Feedback';
 import SidePanel from './SidePanel';
+import SuggestionsPanel from './SuggestionsPanel';
+import BarberServices from '../../components/Barbers/BarberServices';
+
 
 const BarbersDetails = () => {
 
@@ -72,7 +75,7 @@ const BarbersDetails = () => {
                 tab==='about' && <BarberAbout/>
               }
               {
-                tab==='feedback' && <Feedback />
+                tab==='feedback' && <Feedback/>
               }
             </div>
 
@@ -82,7 +85,15 @@ const BarbersDetails = () => {
             <SidePanel/>
           </div>
 
+          <div>
+            <SuggestionsPanel/>
+          </div>
+
         </div>
+      </div>
+
+      <div>
+        <BarberServices/>
       </div>
     </section>
   );
