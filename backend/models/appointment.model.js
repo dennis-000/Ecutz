@@ -5,7 +5,7 @@ const AppointmentSchema = new mongoose.Schema({
   customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   provider: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   date: { type: Date, required: true },
-  time: { type: String, required: true },
+  startTime: { type: String, required: true },
   status: {
     type: String,
     enum: ["pending", "confirmed", "completed", "cancelled"],
