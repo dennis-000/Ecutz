@@ -6,6 +6,11 @@ import Service from "./models/service.model.js"
 import Appointment from "./models/appointment.model.js"
 import Review from "./models/review.model.js"
 import AuditLog from "./models/audit.model.js"
+import multer from "multer"
+import bcrypt from "bcrypt"
+import ProviderService from "./models/providerService.model.js"
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config()
 
@@ -13,6 +18,33 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(express.json()) //allows us to accept json data in the req.body
+
+//function to hash passwords
+const hashPassword = async (password) => {
+    try {
+        const saltRounds = 10; // Number of salt rounds (the higher, the more secure but slower)
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        return hashedPassword;
+    } catch (error) {
+        throw new Error("Error hashing password: " + error.message);
+    }
+};
+
+//multer code
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "uploads/profilepics"); // Directory where files will be saved
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + "-" + uniqueSuffix + "." + file.mimetype.split("/")[1]); // File naming convention
+    },
+  });
+  
+  const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1024 * 1024 * 5 }, // Limit file size to 5MB
+  });
 
 //function or middleware to create an audit log 
 const createAuditLog = async (userId, targetId, targetModel, action, details) => {
@@ -33,16 +65,54 @@ const createAuditLog = async (userId, targetId, targetModel, action, details) =>
 const getAllAuditLogs = async (req, res) => {
     try {
         const auditLogs = await AuditLog.find({}).sort({ timesptamp: -1})
-        res.status(200).json({success: true, message: "Audit Log fetched successfully", data: auditLogs})
+        res.status(200).json({success: true, message: auditLogs.length === 0 ? "No audit logs have been added" : "Audit Log fetched successfully", data: auditLogs})
     } catch (error) {
         console.error("Failed to get audit logs:", error);
         return res.status(200).json({success: true, message: "Audit Log fetched successfully", data: auditLogs})    }
 }
 
+const appointmentIsActive = (appointmentObject) => {
+    if(appointmentObject.status === "pending" || appointmentObject.status === "confirmed"){
+        return true
+    }
+    return false
+}
+
+//Login
+app.post("api/login", async (req, res) => {
+    //login code here
+})
+
+//Get all audit logs
+app.get("/api/audit-logs", getAllAuditLogs)
+
+
 //Users
 app.get("/api/users", async (req, res) => {
     try {
         const users = await User.find({})
+        res.status(200).json({success: true, data: users, message: "Users retrieved successfully"})
+    } catch (error) {
+        console.log("Error in fetching users: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
+//Get all providers
+app.get("/api/users/providers", async (req, res) => {
+    try {
+        const users = await User.find({ role: "provider" })
+        res.status(200).json({success: true, data: users, message: "Providers retrieved successfully"})
+    } catch (error) {
+        console.log("Error in fetching providers: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
+//Get all customers
+app.get("/api/users/customers", async (req, res) => {
+    try {
+        const users = await User.find({ role: "customer" })
         res.status(200).json({success: true, data: users, message: "Users retrieved successfully"})
     } catch (error) {
         console.log("Error in fetching users: ", error.message);
@@ -69,47 +139,97 @@ app.get("/api/users/:id", async (req, res) => {
     }
 })
 
-app.post("/api/users", async (req, res) => {
-    const request = req.body
+app.post("/api/users", upload.single("profilePicture"), async (req, res) => {
+    try {
+    const { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
 
-    const existingUser = await Product.findOne({ email: request.email })
+    const existingUser = await User.findOne({ email })
 
     if(existingUser){
         return res.status(400).json({success: false, message: "User already exists"})
     }
     
-    const newUser = new User(request)
+    const hash = await hashPassword(password)
 
-    try {
-        const newCreatedUser = await newUser.save()
+    const newUser = new User({
+        name,
+        email,
+        password: hash,
+        role,
+        phone,
+        location,
+        status: role === "provider" ? "inactive" : "active",
+        profilePicture: req.file ? `uploads/profilePictures/${req.file.filename}` : null,
+    })
 
-        await createAuditLog(req.user._id, newCreatedUser._id, "User", "create", "User created"); //Log user creation
+    const newCreatedUser = await newUser.save()
 
-        res.status(201).json({success: true, message: "User created successfully"})
+    await createAuditLog(req.user._id, newCreatedUser._id, "User", "create", "User created"); //Log user creation
+
+    res.status(201).json({success: true, message: "User created successfully", data: newCreatedUser})
     } catch (error) {
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
 
-app.put("/api/users/:id", async (req, res) => {
+app.patch("/api/users/:id", upload.single("profilePicture"), async (req, res) => {
+    try{
     const { id } = req.params
 
-    const request = req.body
+    const { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({success:false, message: "User not found"})
     }
+    
+    // Check if user exists
+    const user = await User.findById(id);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
 
-    try{
-        const newUser = await User.findByIdAndUpdate(id, request, { new: true })
+     // Check if email is being updated and if it's unique
+     if (email && email !== user.email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already in use" });
+        }
+    }
 
-        if (!newUser) {
+     // Update profile picture if provided and delete the old one
+     if (req.file) {
+        // Delete old profile picture if it exists
+        if (user.profilePicture && fs.existsSync(path.join(__dirname, `${user.profilePicture}`))) {
+            fs.unlinkSync(path.join(__dirname, `${user.profilePicture}`));
+        }
+
+        // Update with new profile picture
+        const updatedProfilePic = `uploads/profilePictures/${req.file.filename}`;
+    }
+
+    // const hash = hashPassword(password)
+
+    const updatedUser = new User({
+        name,
+        email,
+        // password: hash,
+        role,
+        phone,
+        location,
+        status,
+        profilePicture: req.file ? updatedProfilePic : profilePicture,
+    })
+
+
+        const newUpdatedUser = await User.findByIdAndUpdate(id, updatedUser, { new: true })
+
+        if (!newUpdatedUser) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        await createAuditLog(req.user._id, id, `User", "update", "Updated user with changes: ${JSON.stringify(newUser)}`);
+        await createAuditLog(req.user._id, id, `User", "update", "Updated user with changes: ${JSON.stringify(newUpdatedUser)}`);
 
-        res.status(200).json({success: true, message: "User Updated successfully", data: newUser,})
+        res.status(200).json({success: true, message: "User Updated successfully", data: newUpdatedUser,})
     } catch(error) {
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
@@ -140,6 +260,86 @@ app.delete("/api/users/:id", async (req, res) => {
 })
 
 
+//Provider Service
+app.get("/api/provider-services", async (req, res) => {
+    try {
+        const providerServices = await ProviderService.find({})
+        res.status(200).json({success: true, data: providerServices, message: "Provider Services retrieved successfully"})
+    } catch (error) {
+        console.log("Error in fetching services: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
+app.post("/api/provider-services", async (req, res) => {
+    const request = req.body
+
+    const existingService = await ProviderService.findOne({ provider: request.provider, service: request.service })
+
+    if(existingService){
+        return res.status(400).json({success: false, message: "Service already exists"})
+    }
+    
+    const newProviderService = new ProviderService(request)
+
+    try {
+        await newProviderService.save()
+
+        await createAuditLog(req.user._id, newProviderService._id, "ProviderService", "create", "Provider Service created"); //Log provider service creation
+
+        res.status(201).json({success: true, message: "Provider Service created successfully", data: newProviderService})
+    } catch (error) {
+        console.log("Error occured while saving service: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
+app.patch("/api/provider-services/:id", async (req, res) => {
+    const { id } = req.params
+
+    const providerService = req.body
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success:false, message: "Service not found"})
+    }
+
+    try{
+        const updatedProviderService = await ProviderService.findByIdAndUpdate(id, providerService, { new: true })
+
+        if (!updatedProviderService) {
+            return res.status(404).json({ success: false, message: "Service not found" });
+        }
+
+        await createAuditLog(req.user._id, id, "ProviderService", "update", `Provider Service updated with changes: ${JSON.stringify(updatedProviderService)}`);
+
+        res.status(200).json({success: true, message: "Provider Service Updated successfully", data: updatedProviderService})
+    } catch(error) {
+        console.log("Error occured while updating service: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
+app.delete("/api/provider-services/:id", async (req, res) => {
+    const { id } = req.params
+    console.log("id:",id);
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success:false, message: "Service not found"})
+    }
+
+    try {
+        await ProviderService.findByIdAndDelete(id)
+
+        await createAuditLog(req.user._id, id, "ProviderService", "delete", `Provider Service deleted`);
+        
+        res.status(200).json({success: true, message: "Provider Service Deleted successfully"})
+
+    } catch (error) {
+        console.log(`Error occurred while deleting service: ${error.message}`)
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
 //Service
 app.get("/api/services", async (req, res) => {
     try {
@@ -151,10 +351,22 @@ app.get("/api/services", async (req, res) => {
     }
 })
 
+//Get a single service
+app.get("/api/services/:id", async (req, res) => {
+    const { id } = req.params
+    try {
+        const service = await Service.findById(id)
+        res.status(200).json({success: true, data: service, message: "Service retrieved successfully"})
+    } catch (error) {
+        console.log("Error in fetching service: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
 app.post("/api/services", async (req, res) => {
     const request = req.body
 
-    const existingService = await Service.findOne({ title: request.title, provider: request.provider })
+    const existingService = await Service.findOne({ title: request.title })
 
     if(existingService){
         return res.status(400).json({success: false, message: "Service already exists"})
@@ -174,7 +386,7 @@ app.post("/api/services", async (req, res) => {
     }
 })
 
-app.put("/api/services/:id", async (req, res) => {
+app.patch("/api/services/:id", async (req, res) => {
     const { id } = req.params
 
     const service = req.body
@@ -184,15 +396,15 @@ app.put("/api/services/:id", async (req, res) => {
     }
 
     try{
-        const newService = await Service.findByIdAndUpdate(id, service, { new: true })
+        const updatedService = await Service.findByIdAndUpdate(id, service, { new: true })
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
+        if (!updatedService) {
+            return res.status(404).json({ success: false, message: "Service not found" });
         }
 
         await createAuditLog(req.user._id, id, "Service", "update", `Service updated with changes: ${JSON.stringify(updates)}`);
 
-        res.status(200).json({success: true, message: "Service Updated successfully", data: newService})
+        res.status(200).json({success: true, message: "Service Updated successfully", data: updatedService})
     } catch(error) {
         console.log("Error occured while updating service: ", error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
@@ -231,12 +443,24 @@ app.get("/api/appointments", async (req, res) => {
     }
 })
 
+//Get a single appointment
+app.get("/api/appointments/:id", async (req, res) => {
+    const { id } = req.params
+    try {
+        const appointment = await Appointment.findById(id)
+        res.status(200).json({success: true, data: appointment, message: "Appointment retrieved successfully"})
+    } catch (error) {
+        console.log("Error occurred while fetching appointment: ", error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
 app.post("/api/appointments", async (req, res) => {
     const request = req.body
 
-    const existingAppointment = await Appointment.findOne({ title: request.title, provider: request.provider })
+    const existingAppointment = await Appointment.findOne({ customer: request.customer, provider: request.provider })
 
-    if(existingAppointment){
+    if(existingAppointment && appointmentIsActive(existingAppointment)){
         return res.status(400).json({success: false, message: "Appointment already exists"})
     }
     
@@ -254,7 +478,7 @@ app.post("/api/appointments", async (req, res) => {
     }
 })
 
-app.put("/api/appointments/:id", async (req, res) => {
+app.patch("/api/appointments/:id", async (req, res) => {
     const { id } = req.params
 
     const request = req.body
@@ -264,11 +488,11 @@ app.put("/api/appointments/:id", async (req, res) => {
     }
     
     try{
-        const newAppointment = await Appointment.findByIdAndUpdate(id, request, { new: true })
+        const updatedAppointment = await Appointment.findByIdAndUpdate(id, request, { new: true })
 
-        await createAuditLog(req.user._id, id, "Appointment", "update", `Appointment updated with changes: ${JSON.stringify(newAppointment)}`);
+        await createAuditLog(req.user._id, id, "Appointment", "update", `Appointment updated with changes: ${JSON.stringify(updatedAppointment)}`);
 
-        res.status(200).json({success: true, message: "Appointment Updated successfully", data: newAppointment})
+        res.status(200).json({success: true, message: "Appointment Updated successfully", data: updatedAppointment})
     } catch(error) {
         console.log("Error occured while updating appointments: ", error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
@@ -316,8 +540,8 @@ app.get("/api/reviews/user/:id", async (req, res) => {
     }
 
     try {
-        const Reviews = await Review.find({ customer: id })
-        res.status(200).json({success: true, data: Reviews, message: "Reviews retrieved successfully"})
+        const reviews = await Review.find({ provider: id })
+        res.status(200).json({success: true, data: reviews, message: "Reviews retrieved successfully"})
     } catch (error) {
         console.log("Error in fetching reviews: ", error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})

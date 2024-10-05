@@ -8,6 +8,7 @@ const ProviderServiceSchema = new mongoose.Schema({
   availability: { type: Boolean, default: true }, // Whether the provider offers this service currently
   averageRating: { type: Number, default: 0 }, // Average rating for this provider's service
   images: [{ type: String }],
+  providersDescription: { type: String},
 }, { timestamps: true });
 
 const ProviderService = mongoose.model("ProviderService", ProviderServiceSchema);
