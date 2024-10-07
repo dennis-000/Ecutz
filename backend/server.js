@@ -11,6 +11,7 @@ import bcrypt from "bcrypt"
 import ProviderService from "./models/providerService.model.js"
 import fs from 'fs';
 import path from 'path';
+import updateExpiredAppointments from './controllers/cron.controller.js'; // Your cron job
 
 dotenv.config()
 
@@ -18,6 +19,11 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(express.json()) //allows us to accept json data in the req.body
+
+//cron job
+// Start background job
+cron.schedule('* * * * *', updateExpiredAppointments); // Every minute
+
 
 //function to hash passwords
 const hashPassword = async (password) => {
@@ -72,7 +78,7 @@ const getAllAuditLogs = async (req, res) => {
 }
 
 const appointmentIsActive = (appointmentObject) => {
-    if(appointmentObject.status === "pending" || appointmentObject.status === "confirmed"){
+    if(appointmentObject.status === "pending" || appointmentObject.status === "in-progress"){
         return true
     }
     return false
@@ -120,11 +126,12 @@ app.get("/api/users/customers", async (req, res) => {
     }
 })
 
+//Get a single user
 app.get("/api/users/:id", async (req, res) => {
     const { id } = req.params
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "User not found"})
+        return res.status(404).json({success:false, message: "Invalid User ID"})
     }
 
     try {
@@ -134,7 +141,7 @@ app.get("/api/users/:id", async (req, res) => {
         }
         res.status(200).json({success: true, data: user, message: "User retrieved successfully"})
     } catch (error) {
-        console.log("Error in fetching users: ", error.message);
+        console.log(`Error in fetching user with id ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -168,6 +175,7 @@ app.post("/api/users", upload.single("profilePicture"), async (req, res) => {
 
     res.status(201).json({success: true, message: "User created successfully", data: newCreatedUser})
     } catch (error) {
+        console.log(`Error in creating user: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -179,7 +187,7 @@ app.patch("/api/users/:id", upload.single("profilePicture"), async (req, res) =>
     const { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "User not found"})
+        return res.status(404).json({success:false, message: "Invalid User ID"})
     }
     
     // Check if user exists
@@ -197,28 +205,32 @@ app.patch("/api/users/:id", upload.single("profilePicture"), async (req, res) =>
     }
 
      // Update profile picture if provided and delete the old one
+     const updatedProfilePic = user.profilePicture
      if (req.file) {
         // Delete old profile picture if it exists
         if (user.profilePicture && fs.existsSync(path.join(__dirname, `${user.profilePicture}`))) {
             fs.unlinkSync(path.join(__dirname, `${user.profilePicture}`));
         }
-
+        
         // Update with new profile picture
-        const updatedProfilePic = `uploads/profilePictures/${req.file.filename}`;
+        updatedProfilePic = `uploads/profilePictures/${req.file.filename}`;
     }
 
-    // const hash = hashPassword(password)
+    let hash = user.password
+    if(password){
+        hash = await hashPassword(password)
+    }
 
-    const updatedUser = new User({
-        name,
-        email,
-        // password: hash,
-        role,
-        phone,
-        location,
-        status,
+    const updatedUser = {
+        name: name || user.name,
+        email: email || user.email,
+        password: hash,
+        role: role || user.role,
+        phone: phone || user.phone,
+        location: location || user.location,
+        status: status || user.status,
         profilePicture: req.file ? updatedProfilePic : profilePicture,
-    })
+    }
 
 
         const newUpdatedUser = await User.findByIdAndUpdate(id, updatedUser, { new: true })
@@ -227,10 +239,11 @@ app.patch("/api/users/:id", upload.single("profilePicture"), async (req, res) =>
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        await createAuditLog(req.user._id, id, `User", "update", "Updated user with changes: ${JSON.stringify(newUpdatedUser)}`);
+        await createAuditLog(req.user._id, id, `User", "update", "Updated user with changes: ${JSON.stringify(updatedUser)}`);
 
         res.status(200).json({success: true, message: "User Updated successfully", data: newUpdatedUser,})
     } catch(error) {
+        console.log(`Error in fetching user with id ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -240,7 +253,7 @@ app.delete("/api/users/:id", async (req, res) => {
     console.log("id:",id);
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "User not found"})
+        return res.status(404).json({success:false, message: "Invalid User ID"})
     }
 
     try {
@@ -250,11 +263,16 @@ app.delete("/api/users/:id", async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
+         // Delete profile picture if it exists
+         if (deletedUser.profilePicture && fs.existsSync(path.join(__dirname, deletedUser.profilePicture))) {
+            fs.unlinkSync(path.join(__dirname, deletedUser.profilePicture));
+        }
+
         await createAuditLog(req.user._id, deletedUser._id, "User", "delete", "User Deleted"); //Log user deletion
 
         res.status(200).json({success: true, message: "User Deleted successfully"})
     } catch (error) {
-        console.log(`Error in Delete User: ${error.message}`)
+        console.log(`Error in deleting user with id ${id}: ${error.message}`)
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -271,18 +289,42 @@ app.get("/api/provider-services", async (req, res) => {
     }
 })
 
+//Get a single provider service
+app.get("/api/provider-services/:id", async (req, res) => {
+    const { id } = req.params
+
+    //Check if id is a valid mongoose valid
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success:false, message: "Invalid service id"})
+    }
+
+    try {
+        const providerService = await ProviderService.findById(id)
+        if (!providerService) {
+            return res.status(404).json({ success: false, message: "Provider Service not found" });
+        }
+        res.status(200).json({success: true, data: providerService, message: "Provider Services retrieved successfully"})
+    } catch (error) {
+        console.log(`Error in fetching provider's services with id ${id}: `, error.message);
+        return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+})
+
+
 app.post("/api/provider-services", async (req, res) => {
     const request = req.body
 
-    const existingService = await ProviderService.findOne({ provider: request.provider, service: request.service })
-
-    if(existingService){
-        return res.status(400).json({success: false, message: "Service already exists"})
+    if (!request.provider || !request.service) {
+        return res.status(400).json({ success: false, message: "Provider and Service are required" });
     }
-    
-    const newProviderService = new ProviderService(request)
 
     try {
+        const existingService = await ProviderService.findOne({ provider: request.provider, service: request.service })
+        if(existingService){
+            return res.status(400).json({success: false, message: "Service already exists"})
+        }
+        
+        const newProviderService = new ProviderService(request)
         await newProviderService.save()
 
         await createAuditLog(req.user._id, newProviderService._id, "ProviderService", "create", "Provider Service created"); //Log provider service creation
@@ -300,7 +342,7 @@ app.patch("/api/provider-services/:id", async (req, res) => {
     const providerService = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "Service not found"})
+        return res.status(404).json({success:false, message: "Invalid Service ID"})
     }
 
     try{
@@ -324,7 +366,7 @@ app.delete("/api/provider-services/:id", async (req, res) => {
     console.log("id:",id);
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "Service not found"})
+        return res.status(404).json({success:false, message: "Invalid Service ID"})
     }
 
     try {
@@ -354,11 +396,19 @@ app.get("/api/services", async (req, res) => {
 //Get a single service
 app.get("/api/services/:id", async (req, res) => {
     const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success:false, message: "Invalid Service ID"})
+    }
+
     try {
         const service = await Service.findById(id)
+        if (!service) {
+            return res.status(404).json({ success: false, message: "Service not found" });
+        }
         res.status(200).json({success: true, data: service, message: "Service retrieved successfully"})
     } catch (error) {
-        console.log("Error in fetching service: ", error.message);
+        console.log(`Error in fetching service with id ${ id }: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -392,7 +442,7 @@ app.patch("/api/services/:id", async (req, res) => {
     const service = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "Service not found"})
+        return res.status(404).json({success:false, message: "Invalid Service ID"})
     }
 
     try{
@@ -402,11 +452,11 @@ app.patch("/api/services/:id", async (req, res) => {
             return res.status(404).json({ success: false, message: "Service not found" });
         }
 
-        await createAuditLog(req.user._id, id, "Service", "update", `Service updated with changes: ${JSON.stringify(updates)}`);
+        await createAuditLog(req.user._id, id, "Service", "update", `Service updated with changes: ${JSON.stringify(service)}`);
 
         res.status(200).json({success: true, message: "Service Updated successfully", data: updatedService})
     } catch(error) {
-        console.log("Error occured while updating service: ", error.message);
+        console.log(`Error occured while updating service with id ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -416,18 +466,21 @@ app.delete("/api/services/:id", async (req, res) => {
     console.log("id:",id);
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "User not found"})
+        return res.status(404).json({success:false, message: "Invalid Service ID"})
     }
 
     try {
-        await Service.findByIdAndDelete(id)
+        const deletedService = await Service.findByIdAndDelete(id)
+        if (!deletedService) {
+            return res.status(404).json({ success: false, message: "Service not found" });
+        }
 
         await createAuditLog(req.user._id, id, "Service", "delete", `Service deleted`);
         
         res.status(200).json({success: true, message: "Service Deleted successfully"})
 
     } catch (error) {
-        console.log(`Error occurred while deleting service: ${error.message}`)
+        console.log(`Error occurred while deleting service with id${id}: ${error.message}`)
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -446,11 +499,16 @@ app.get("/api/appointments", async (req, res) => {
 //Get a single appointment
 app.get("/api/appointments/:id", async (req, res) => {
     const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({success:false, message: "Appointment not found"})
+    }
+
     try {
         const appointment = await Appointment.findById(id)
         res.status(200).json({success: true, data: appointment, message: "Appointment retrieved successfully"})
     } catch (error) {
-        console.log("Error occurred while fetching appointment: ", error.message);
+        console.log(`Error occurred while fetching appointment with id ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -458,10 +516,10 @@ app.get("/api/appointments/:id", async (req, res) => {
 app.post("/api/appointments", async (req, res) => {
     const request = req.body
 
-    const existingAppointment = await Appointment.findOne({ customer: request.customer, provider: request.provider })
+    const existingAppointment = await Appointment.findOne({ customer: request.customer, provider: request.provider, date: request.date })
 
     if(existingAppointment && appointmentIsActive(existingAppointment)){
-        return res.status(400).json({success: false, message: "Appointment already exists"})
+        return res.status(400).json({success: false, message: "Appointment already exists for the selected date"})
     }
     
     const newAppointment = new Appointment(request)
@@ -490,11 +548,15 @@ app.patch("/api/appointments/:id", async (req, res) => {
     try{
         const updatedAppointment = await Appointment.findByIdAndUpdate(id, request, { new: true })
 
+        if(!updatedAppointment){
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
         await createAuditLog(req.user._id, id, "Appointment", "update", `Appointment updated with changes: ${JSON.stringify(updatedAppointment)}`);
 
         res.status(200).json({success: true, message: "Appointment Updated successfully", data: updatedAppointment})
     } catch(error) {
-        console.log("Error occured while updating appointments: ", error.message);
+        console.log(`Error occured while updating appointment with id ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -508,14 +570,18 @@ app.delete("/api/appointments/:id", async (req, res) => {
     }
 
     try {
-        await Appointment.findByIdAndDelete(id)
+        const deletedAppointment = await Appointment.findByIdAndDelete(id)
+
+        if (!deletedAppointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
 
         await createAuditLog(req.user._id, id, "Appointment", "delete", `Appointment deleted`);
 
         res.status(200).json({success: true, message: "Appointment Deleted successfully"})
 
     } catch (error) {
-        console.log(`Error in deleting Appointment: ${error.message}`)
+        console.log(`Error in deleting appointment with id ${id}: ${error.message}`)
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -523,8 +589,8 @@ app.delete("/api/appointments/:id", async (req, res) => {
 //Review
 app.get("/api/reviews", async (req, res) => {
     try {
-        const Reviews = await Review.find({})
-        res.status(200).json({success: true, data: Reviews, message: "Reviews retrieved successfully"})
+        const reviews = await Review.find({})
+        res.status(200).json({success: true, data: reviews, message: "Reviews retrieved successfully"})
     } catch (error) {
         console.log("Error in fetching reviews: ", error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
@@ -536,14 +602,19 @@ app.get("/api/reviews/user/:id", async (req, res) => {
     const { id } = req.params
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "User not found"})
+        return res.status(404).json({success:false, message: "Invalid Review ID"})
     }
 
     try {
         const reviews = await Review.find({ provider: id })
+
+        if (reviews.length === 0) {
+            return res.status(404).json({ success: false, message: "No reviews found for this user" });
+        }
+
         res.status(200).json({success: true, data: reviews, message: "Reviews retrieved successfully"})
     } catch (error) {
-        console.log("Error in fetching reviews: ", error.message);
+        console.log(`Error in fetching reviews of user ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -566,13 +637,13 @@ app.post("/api/reviews", async (req, res) => {
     }
 })
 
-app.put("/api/reviews/:id", async (req, res) => {
+app.patch("/api/reviews/:id", async (req, res) => {
     const { id } = req.params
 
     const request = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "Review not found"})
+        return res.status(404).json({success:false, message: "Invalid Review ID"})
     }
 
     try{
@@ -582,7 +653,7 @@ app.put("/api/reviews/:id", async (req, res) => {
 
         res.status(200).json({success: true, message: "Review updated successfully", data: newReview})
     } catch(error) {
-        console.log("Error occured while updating review: ", error.message);
+        console.log(`Error occured while updating review with id ${id}: `, error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
@@ -592,7 +663,7 @@ app.delete("/api/reviews/:id", async (req, res) => {
     console.log("id:",id);
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({success:false, message: "Review not found"})
+        return res.status(404).json({success:false, message: "Invalid Review ID"})
     }
 
     try {
@@ -603,7 +674,7 @@ app.delete("/api/reviews/:id", async (req, res) => {
         res.status(200).json({success: true, message: "Review Deleted successfully"})
 
     } catch (error) {
-        console.log(`Error in deleting review: ${error.message}`)
+        console.log(`Error in deleting review with id ${id}: ${error.message}`)
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 })
