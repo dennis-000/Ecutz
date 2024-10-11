@@ -1,4 +1,4 @@
-# Zeal Craft Innovation Developers Team
+## Zeal Craft Innovation Developers Team
 # Ecutz
 
 ## Ecutz Barbering App for University of Ghana, Legon
