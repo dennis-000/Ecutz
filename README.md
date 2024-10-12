@@ -8,14 +8,15 @@ Ecutz is a barbering service booking app designed for students at the University
 - **User Registration & Login**: Students can create an account, log in, and manage their profile.
 - **Barber Listing**: Registered barbers are displayed, and students can book appointments with specific barbers.
 - **Appointment Scheduling**: Students can easily schedule barbering appointments.
-- **Responsive Design**: The app is mobile-friendly and works seamlessly across different devices.
+- **Responsive Design**: The mobile-friendly app works seamlessly across different devices.
+- ##AND OTHERS
 
 ## Tech Stack
 This project is built using the MERN stack:
 
 - **MongoDB**: NoSQL database for storing user, barber, and appointment data.
 - **Express.js**: Backend framework for handling API requests and routing.
-- **React**: Frontend framework used to build the user interface.
+- **React**: The frontend framework is used to build the user interface.
 - **Node.js**: JavaScript runtime environment for the server-side application.
 
 ## Project Structure
