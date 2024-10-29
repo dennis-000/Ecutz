@@ -1,6 +1,6 @@
-import doctorImg01 from "../images/doctor-img01.png";
-import doctorImg02 from "../images/doctor-img02.png";
-import doctorImg03 from "../images/doctor-img03.png";
+import barberImg01 from "../images/barber-img01.jpg";
+import barberImg02 from "../images/barber-img02.jpg";
+import barberImg03 from "../images/barber-img03.jpg";
 
 export const barbers = [{
         id: "01",
@@ -8,7 +8,7 @@ export const barbers = [{
         specialization: "Fade Specialist",
         avgRating: 4.8,
         totalRating: 272,
-        photo: doctorImg01,
+        photo: barberImg01,
         totalClients: 500,
         location: "University of Ghana, Legon",
     },
@@ -18,7 +18,7 @@ export const barbers = [{
         specialization: "Beard Grooming Expert",
         avgRating: 4.7,
         totalRating: 250,
-        photo: doctorImg02,
+        photo: barberImg02,
         totalClients: 450,
         location: "University of Ghana, Legon",
     },
@@ -28,7 +28,7 @@ export const barbers = [{
         specialization: "Classic Cuts",
         avgRating: 4.9,
         totalRating: 300,
-        photo: doctorImg03,
+        photo: barberImg03,
         totalClients: 600,
         location: "University of Ghana, Legon",
     },

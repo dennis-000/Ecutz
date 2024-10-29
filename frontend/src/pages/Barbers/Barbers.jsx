@@ -1,4 +1,4 @@
-import BarberCard from "./../../components/Barbers/BarberCard"
+import BarberCard from "./../../components/Barbers/BarberCard";
 import { barbers } from "./../../assets/data/barbers";
 import Testimonial from "../../components/Testimonial/Testimonial";
 const Barbers = () => {
@@ -32,6 +32,7 @@ const Barbers = () => {
             {barbers.map((barber) =>
               <BarberCard key={barber.id} barber={barber} />// Each card needs a unique key
             )}
+
           </div>
         </div>
       </section>
