@@ -11,7 +11,7 @@ const BarberCard = ({ barber }) => {
         name,
         avgRating,
         totalRating,
-        photo,
+        photo,  
         specialization,
         totalClients,
         location

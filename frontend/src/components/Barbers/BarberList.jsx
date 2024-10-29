@@ -9,9 +9,9 @@ const BarberList = () => {
     lg:mt-[55px]'> {/* Grid container for the barber cards */}
       
       {/* Mapping through the barbers array and rendering a BarberCard for each barber */}
-      {barbers.map((barber) =>
-        <BarberCard key={barber.id} barber={barber} />// Each card needs a unique key
-      )}
+      {barbers.map((barber) => (
+  <BarberCard key={barber.id} barber={barber} />
+))}
     </div>
   );
 };

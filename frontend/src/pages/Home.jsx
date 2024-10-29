@@ -7,7 +7,7 @@ import avatarIcon from '../assets/images/avatar-icon.png'
 import icon01 from '../assets/images/icon01.png'
 import icon02 from '../assets/images/icon02.png'
 import icon03 from '../assets/images/icon03.png'
-import faqImg from '../assets/images/faq-img1.jpg';
+import faqImg from '../assets/images/faq-img1.png';
 import { Link } from 'react-router-dom';
 import { BsArrowRight } from 'react-icons/bs';
 import About from '../components/About/about';
