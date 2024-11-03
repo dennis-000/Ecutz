@@ -1,8 +1,8 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import ServiceCard from '../components/Services/ServiceCard';
 import { services } from '../assets/data/services';
-import { BsArrowRight, BsSearch, BsScissors } from 'react-icons/bs';
+import { BsSearch, BsScissors } from 'react-icons/bs';
 import BottomCTA from '../components/CTA/BottomCTA';
 
 const Services = () => {
@@ -31,7 +31,7 @@ const Services = () => {
           </div>
           <p className="text-[16px] leading-7 text-textColor max-w-2xl mx-auto">
             Experience the art of grooming with our professional barbers. 
-            From classic cuts to modern styles, we've got you covered.
+            From classic cuts to modern styles, we&apos;ve got you covered.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ const Services = () => {
 
       <div>
         <BottomCTA/>
-      `</div>
+      </div>
     </section>
   );
 };
