@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import cron from 'node-cron';
 import Appointment from '../models/appointment.model.js';
 
