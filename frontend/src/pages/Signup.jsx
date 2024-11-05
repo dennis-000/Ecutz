@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 
 import signupImg from '../assets/images/signup.gif';
-import avatar from '../assets/images/doctor-img01.png'
+import avatar from '../assets/images/doctor-img01.png';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -19,6 +20,7 @@ const Signup = () => {
   });
 
   const handleInputChange = e => {
+    console.log('formData')
     setFormData({ ...formData, [e.target.name]: e.target.value })
   };
   

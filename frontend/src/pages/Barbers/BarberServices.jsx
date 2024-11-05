@@ -1,86 +1,399 @@
-import React from 'react';
+// eslint-disable-next-line no-unused-vars
+import React, { useState } from 'react';
+import { Calendar, ShoppingCart, X } from 'lucide-react';
 
-const BarberServices = () => {
+const BookingSystem = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  
+
+  // Sample data with prices in Ghanaian Cedis
   const services = [
     {
       id: 1,
-      name: "Classic Haircut",
-      price: 30,
+      name: "Men's Haircut",
       duration: "30 min",
-      description: "Traditional haircut including neck trim and styling for a clean, professional look"
+      price: 150,
+      image: "/api/placeholder/100/100"
     },
     {
       id: 2,
-      name: "Beard Trim & Shape",
-      price: 25,
+      name: "Beard Trim",
       duration: "20 min",
-      description: "Expert beard grooming service including shape design and precise trimming"
+      price: 100,
+      image: "/api/placeholder/100/100"
     },
     {
       id: 3,
-      name: "Hot Towel Shave",
-      price: 35,
-      duration: "40 min",
-      description: "Premium straight razor shave with hot towel treatment for ultimate relaxation"
+      name: "Hair & Beard Combo",
+      duration: "45 min",
+      price: 225,
+      image: "/api/placeholder/100/100"
     },
     {
       id: 4,
-      name: "Haircut & Beard Combo",
-      price: 50,
-      duration: "50 min",
-      description: "Complete grooming package combining our classic haircut with beard trim service"
-    },
-    {
-      id: 5,
       name: "Kids Haircut",
-      price: 20,
       duration: "20 min",
-      description: "Gentle and patient haircut service specially designed for children under 12"
+      price: 125,
+      image: "/api/placeholder/100/100"
     }
   ];
 
-  return (
-    <div className="mt-[30px]">
-      <h3 className="text-[20px] leading-[30px] text-headingColor font-semibold">
-        Available Services ✂️
-      </h3>
+  const staff = [
+    {
+      id: 1,
+      name: "John Smith",
+      role: "Master Barber",
+      rating: 4.9,
+      reviews: 128,
+      image: "/api/placeholder/100/100"
+    },
+    {
+      id: 2,
+      name: "Mike Johnson",
+      role: "Senior Barber",
+      rating: 4.8,
+      reviews: 95,
+      image: "/api/placeholder/100/100"
+    }
+  ];
 
-      <div className="mt-[30px] grid gap-5">
-        {services.map((service) => (
-          <div 
-            key={service.id} 
-            className="p-4 rounded-md border border-solid border-[#0066ff34] hover:shadow-md transition-all"
+  const calculateTotalDuration = () => {
+    return selectedServices.reduce((total, service) => {
+      const duration = parseInt(service.duration);
+      return total + duration;
+    }, 0);
+  };
+
+  const calculateTotalPrice = () => {
+    return selectedServices.reduce((total, service) => total + service.price, 0);
+  };
+
+  const formatPrice = (price) => {
+    return `GH₵${price.toFixed(2)}`;
+  };
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour <= 19; hour++) {
+      for (let minute of ['00', '30']) {
+        slots.push(`${hour}:${minute}`);
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+
+  const getNextSevenDays = () => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      days.push({
+        full: date.toISOString().split('T')[0],
+        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        date: date.getDate()
+      });
+    }
+    return days;
+  };
+
+  const handleServiceSelect = (service) => {
+    setSelectedServices(prev => [...prev, service]);
+  };
+
+  const handleRemoveService = (serviceId) => {
+    setSelectedServices(prev => prev.filter(service => service.id !== serviceId));
+  };
+
+  const handleProceedToStaff = () => {
+    if (selectedServices.length > 0) {
+      setCurrentStep(2);
+    }
+  };
+
+  const handleStaffSelect = (staffMember) => {
+    setSelectedStaff(staffMember);
+    setCurrentStep(3);
+  };
+
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
+  };
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+    setCurrentStep(4);
+  };
+
+  const ServiceCart = () => (
+    <div className="bg-gray-50 p-4 rounded-lg mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold flex items-center">
+          <ShoppingCart className="w-5 h-5 mr-2" />
+          Selected Services
+        </h3>
+        <span className="text-sm text-gray-500">
+          Total Duration: {calculateTotalDuration()} min
+        </span>
+      </div>
+      {selectedServices.length > 0 ? (
+        <div className="space-y-2">
+          {selectedServices.map((service) => (
+            <div key={service.id} className="flex items-center justify-between bg-white p-2 rounded">
+              <div>
+                <span className="font-medium">{service.name}</span>
+                <span className="text-sm text-gray-500 ml-2">{formatPrice(service.price)}</span>
+              </div>
+              <button
+                onClick={() => handleRemoveService(service.id)}
+                className="text-gray-400 hover:text-red-500"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          ))}
+          <div className="flex justify-between pt-3 border-t mt-3">
+            <span className="font-semibold">Total:</span>
+            <span className="font-bold">{formatPrice(calculateTotalPrice())}</span>
+          </div>
+          <button
+            onClick={handleProceedToStaff}
+            className="w-full mt-4 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
           >
-            <div className="flex items-center justify-between flex-wrap">
-              <div className="flex-1">
-                <h4 className="text-[18px] leading-7 font-semibold text-headingColor">
-                  {service.name}
-                </h4>
-                <p className="text-[14px] leading-6 font-[400] text-textColor mt-2">
-                  {service.description}
-                </p>
-                <span className="text-[14px] leading-6 font-[400] text-textColor flex items-center gap-2">
-                  ⏱️ {service.duration}
-                </span>
-              </div>
-              
-              <div className="flex flex-col items-end gap-3">
-                <span className="text-[16px] leading-7 lg:text-[18px] lg:leading-8 font-bold text-headingColor">
-                  ${service.price}
-                </span>
-                <button 
-                  className="bg-primaryColor py-2 px-4 text-white text-[14px] leading-6 font-[600] 
-                    rounded-md hover:bg-irisBlueColor transition-all"
-                >
-                  Book Now
-                </button>
-              </div>
+            Proceed to Select Staff
+          </button>
+        </div>
+      ) : (
+        <p className="text-gray-500 text-sm">No services selected</p>
+      )}
+    </div>
+  );
+
+  const ServiceSelection = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2">
+      {services.map((service) => (
+        <div
+          key={service.id}
+          onClick={() => handleServiceSelect(service)}
+          className="flex items-center p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all"
+        >
+          <img src={service.image} alt={service.name} className="w-16 h-16 rounded-lg object-cover" />
+          <div className="ml-4 flex-1">
+            <h3 className="font-semibold">{service.name}</h3>
+            <p className="text-sm text-gray-500">{service.duration}</p>
+            <p className="text-blue-600 font-semibold">{formatPrice(service.price)}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const BookingSteps = () => (
+    <div className="flex flex-wrap items-center justify-center mb-8 text-sm gap-4 px-2">
+      {[
+        { num: 1, text: "Services" },
+        { num: 2, text: "Staff" },
+        { num: 3, text: "Date & Time" },
+        { num: 4, text: "Confirm" }
+      ].map((step, index) => (
+        <div key={step.num} className="flex items-center">
+          <div className={`flex items-center ${currentStep >= step.num ? 'text-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 
+              ${currentStep >= step.num ? 'border-blue-600 bg-blue-50' : 'border-gray-300'}`}>
+              {step.num}
+            </div>
+            <span className="ml-2 hidden sm:inline">{step.text}</span>
+          </div>
+          {step.num < 4 && (
+            <div className={`w-8 sm:w-12 h-0.5 mx-2 ${currentStep > step.num ? 'bg-blue-600' : 'bg-gray-300'}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const StaffSelection = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2">
+      {staff.map((person) => (
+        <div
+          key={person.id}
+          onClick={() => handleStaffSelect(person)}
+          className="flex items-center p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all"
+        >
+          <img src={person.image} alt={person.name} className="w-16 h-16 rounded-full object-cover" />
+          <div className="ml-4">
+            <h3 className="font-semibold">{person.name}</h3>
+            <p className="text-sm text-gray-500">{person.role}</p>
+            <div className="flex items-center text-sm">
+              <span className="text-yellow-400">★</span>
+              <span className="ml-1">{person.rating}</span>
+              <span className="ml-2 text-gray-500">({person.reviews} reviews)</span>
             </div>
           </div>
-        ))}
+        </div>
+      ))}
+    </div>
+  );
+
+  const DateTimeSelection = () => (
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <h3 className="font-semibold flex items-center px-4">
+          <Calendar className="w-5 h-5 mr-2" />
+          Select Date
+        </h3>
+        <div className="relative">
+          <div className="flex overflow-x-auto scrollbar-hide pb-2 px-4 -mx-4 scroll-smooth">
+            <div className="flex space-x-2">
+              {getNextSevenDays().map((date) => (
+                <button
+                  key={date.full}
+                  onClick={() => handleDateSelect(date.full)}
+                  className={`flex flex-col items-center justify-center p-2 rounded-lg w-16 h-20
+                    ${selectedDate === date.full 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200'}`}
+                >
+                  <span className="text-xs font-medium">{date.day}</span>
+                  <span className="text-lg font-bold mt-1">{date.date}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="hidden sm:block absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white pointer-events-none" />
+        </div>
       </div>
+
+      {selectedDate && (
+        <div className="space-y-4 px-4">
+          <h3 className="font-semibold">Select Time</h3>
+          <div className="relative">
+            <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-6 gap-2 max-h-[280px] overflow-y-auto pr-2">
+              {timeSlots.map((time) => (
+                <button
+                  key={time}
+                  onClick={() => handleTimeSelect(time)}
+                  className={`p-3 rounded text-sm font-medium transition-colors
+                    ${selectedTime === time 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200'}`}
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
+            <div className="absolute bottom-0 left-0 right-2 h-8 bg-gradient-to-t from-white pointer-events-none" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const Confirmation = () => (
+    <div className="space-y-6 px-2">
+      <div className="bg-blue-50 p-4 rounded-lg">
+        <h3 className="font-semibold mb-4">Booking Summary</h3>
+        <div className="space-y-3">
+          <div>
+            <span className="text-gray-600">Services:</span>
+            <div className="mt-2 space-y-2">
+              {selectedServices.map(service => (
+                <div key={service.id} className="flex justify-between text-sm">
+                  <span>{service.name}</span>
+                  <span className="font-semibold">{formatPrice(service.price)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Staff:</span>
+            <span className="font-semibold">{selectedStaff?.name}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Date:</span>
+            <span className="font-semibold">
+              {new Date(selectedDate).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Time:</span>
+            <span className="font-semibold">{selectedTime}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Total Duration:</span>
+            <span className="font-semibold">{calculateTotalDuration()} min</span>
+          </div>
+          <div className="flex justify-between pt-3 border-t">
+            <span className="text-gray-600">Total Price:</span>
+            <span className="font-bold text-lg">{formatPrice(calculateTotalPrice())}</span>
+          </div>
+        </div>
+      </div>
+
+      <button 
+        onClick={() => alert('Booking confirmed!')}
+        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Confirm Booking
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="max-w-3xl mx-auto p-4">
+      <BookingSteps />
+      
+      <div className="mt-8">
+        {currentStep === 1 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Select Services</h2>
+            <ServiceCart />
+            <ServiceSelection />
+          </>
+        )}
+
+        {currentStep === 2 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Select Staff</h2>
+            <StaffSelection />
+          </>
+        )}
+
+        {currentStep === 3 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Select Date & Time</h2>
+            <DateTimeSelection />
+          </>
+        )}
+
+        {currentStep === 4 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Confirm Booking</h2>
+            <Confirmation />
+          </>
+        )}
+      </div>
+
+      {currentStep > 1 && (
+        <button
+          onClick={() => setCurrentStep(currentStep - 1)}
+          className="mt-6 text-blue-500 hover:text-blue-600 px-2"
+        >
+          ← Back to previous step
+        </button>
+      )}
     </div>
   );
 };
 
-export default BarberServices;
+export default BookingSystem;
