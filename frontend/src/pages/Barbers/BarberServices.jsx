@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import { Calendar, ShoppingCart, X } from 'lucide-react';
+import service1 from '../../assets/images/classicFade.jpg';
 
 const BookingSystem = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -17,7 +18,7 @@ const BookingSystem = () => {
       name: "Men's Haircut",
       duration: "30 min",
       price: 150,
-      image: "/api/placeholder/100/100"
+      image: service1,
     },
     {
       id: 2,
@@ -41,14 +42,14 @@ const BookingSystem = () => {
       image: "/api/placeholder/100/100"
     }
   ];
-
-
+    
   const calculateTotalDuration = () => {
     return selectedServices.reduce((total, service) => {
-      const duration = parseInt(service.duration);
-      return total + duration;
+      const duration = parseInt(service.duration, 10);
+      return total + (isNaN(duration) ? 0 : duration);
     }, 0);
   };
+  
 
   const calculateTotalPrice = () => {
     return selectedServices.reduce((total, service) => total + service.price, 0);
@@ -85,8 +86,11 @@ const BookingSystem = () => {
   };
 
   const handleServiceSelect = (service) => {
-    setSelectedServices(prev => [...prev, service]);
+    setSelectedServices(prev => 
+      prev.find(s => s.id === service.id) ? prev : [...prev, service]
+    );
   };
+  
 
   const handleRemoveService = (serviceId) => {
     setSelectedServices(prev => prev.filter(service => service.id !== serviceId));
@@ -275,11 +279,13 @@ const BookingSystem = () => {
       <div className="bg-blue-50 p-4 rounded-lg">
         <h3 className="font-semibold mb-4">Booking Summary</h3>
         <div className="space-y-3">
+
+          {/* ===== Display name of Service selected even multiple with their prices ====== */}
           <div>
             <span className="text-gray-600">Services:</span>
             <div className="mt-2 space-y-2">
               {selectedServices.map(service => (
-                <div key={service.id} className="flex justify-between text-sm">
+                <div key={service.id} className="flex justify-between text-sm font-semibold">
                   <span>{service.name}</span>
                   <span className="font-semibold">{formatPrice(service.price)}</span>
                 </div>
@@ -288,10 +294,11 @@ const BookingSystem = () => {
           </div>
 
           {/* ==== Display Payment Method ===== */}
-          <div>
+          <div className='flex flex-col sm:flex-row sm:justify-between gap-1'>
             <span className="text-gray-600">Payment Method:</span>
             <span className="font-semibold">{selectedPaymentMethod}</span>
           </div>
+
           {/* ===== Display Time and Date */}
           <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="text-gray-600">Date:</span>
@@ -321,10 +328,12 @@ const BookingSystem = () => {
           </div>
         </div>
       </div>
+      
               {/* === confirm Booking ===== */}
               {/* ====== Later the Booking Button will lead to Payment Gateway */}
-      <button 
-        onClick={() => alert('Booking confirmed!')}
+              {/* ==== for now just gives an alert */}
+      <button
+        // onClick={() => alert('Booking confirmed!')}
         className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
       >
         Confirm Booking
@@ -378,7 +387,9 @@ const BookingSystem = () => {
         </button>
       )}
     </div>
+  
   );
+
 };
 
 export default BookingSystem;

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import classicFade from '../../assets/images/classicFade.jpg';
 import beardTrimming from '../../assets/images/beardTrimming.jpg';
