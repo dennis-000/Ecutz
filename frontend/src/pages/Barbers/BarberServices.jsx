@@ -1,222 +1,399 @@
-/* eslint-disable no-unused-vars */
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
+import { Calendar, ShoppingCart, X } from 'lucide-react';
 
-const BarberServices = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedService, setSelectedService] = useState(null);
-  const [selectedBarber, setSelectedBarber] = useState(null);
+const BookingSystem = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
   const [selectedServices, setSelectedServices] = useState([]);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [emailReminder, setEmailReminder] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  
 
-  const categories = [
-    { id: 1, name: 'Haircuts' },
-    { id: 2, name: 'Beard Services' },
+  // Sample data with prices in Ghanaian Cedis
+  const services = [
+    {
+      id: 1,
+      name: "Men's Haircut",
+      duration: "30 min",
+      price: 150,
+      image: "/api/placeholder/100/100"
+    },
+    {
+      id: 2,
+      name: "Beard Trim",
+      duration: "20 min",
+      price: 100,
+      image: "/api/placeholder/100/100"
+    },
+    {
+      id: 3,
+      name: "Hair & Beard Combo",
+      duration: "45 min",
+      price: 225,
+      image: "/api/placeholder/100/100"
+    },
+    {
+      id: 4,
+      name: "Kids Haircut",
+      duration: "20 min",
+      price: 125,
+      image: "/api/placeholder/100/100"
+    }
   ];
 
-  const services = {
-    Haircuts: [
-      {
-        id: 1,
-        name: 'Classic Haircut',
-        price: 30,
-        duration: '30 min',
-        description: 'Traditional haircut including neck trim and styling.',
-      },
-      {
-        id: 2,
-        name: 'Fade Haircut',
-        price: 35,
-        duration: '30 min',
-        description: 'Stylish fade haircut tailored to your preferences.',
-      },
-    ],
-    'Beard Services': [
-      {
-        id: 3,
-        name: 'Beard Trim & Shape',
-        price: 25,
-        duration: '20 min',
-        description: 'Expert beard grooming service including shape design.',
-      },
-      {
-        id: 4,
-        name: 'Beard Styling',
-        price: 20,
-        duration: '15 min',
-        description: 'Stylish beard styling for a polished look.',
-      },
-    ],
-  };
-
-  const barbers = [
-    { id: 1, name: 'John Doe', experience: '5 years', specialization: 'Haircuts' },
-    { id: 2, name: 'Jane Smith', experience: '3 years', specialization: 'Beard Services' },
+  const staff = [
+    {
+      id: 1,
+      name: "John Smith",
+      role: "Master Barber",
+      rating: 4.9,
+      reviews: 128,
+      image: "/api/placeholder/100/100"
+    },
+    {
+      id: 2,
+      name: "Mike Johnson",
+      role: "Senior Barber",
+      rating: 4.8,
+      reviews: 95,
+      image: "/api/placeholder/100/100"
+    }
   ];
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-    setSelectedService(null); // Reset service when category changes
+  const calculateTotalDuration = () => {
+    return selectedServices.reduce((total, service) => {
+      const duration = parseInt(service.duration);
+      return total + duration;
+    }, 0);
   };
 
-  const handleBookClick = (service) => {
-    setSelectedService(service);
-    setIsModalOpen(true);
+  const calculateTotalPrice = () => {
+    return selectedServices.reduce((total, service) => total + service.price, 0);
   };
 
-  const handleAddService = () => {
-    if (selectedService && selectedBarber) {
-      setSelectedServices([...selectedServices, { ...selectedService, barber: selectedBarber }]);
-      setSelectedService(null);
-      setSelectedBarber(null);
-      setDate('');
-      setTime('');
+  const formatPrice = (price) => {
+    return `GH₵${price.toFixed(2)}`;
+  };
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour <= 19; hour++) {
+      for (let minute of ['00', '30']) {
+        slots.push(`${hour}:${minute}`);
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+
+  const getNextSevenDays = () => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      days.push({
+        full: date.toISOString().split('T')[0],
+        day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        date: date.getDate()
+      });
+    }
+    return days;
+  };
+
+  const handleServiceSelect = (service) => {
+    setSelectedServices(prev => [...prev, service]);
+  };
+
+  const handleRemoveService = (serviceId) => {
+    setSelectedServices(prev => prev.filter(service => service.id !== serviceId));
+  };
+
+  const handleProceedToStaff = () => {
+    if (selectedServices.length > 0) {
+      setCurrentStep(2);
     }
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedService(null);
-    setSelectedBarber(null);
-    setSelectedServices([]);
-    setDate('');
-    setTime('');
+  const handleStaffSelect = (staffMember) => {
+    setSelectedStaff(staffMember);
+    setCurrentStep(3);
   };
 
-  const handleConfirmBooking = () => {
-    // Handle confirmation logic, e.g., API call
-    alert('Booking confirmed!');
-    handleModalClose();
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
   };
 
-  return (
-    <div className="mt-[30px]">
-      <h3 className="text-[20px] leading-[30px] text-headingColor font-semibold">Available Services ✂️</h3>
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+    setCurrentStep(4);
+  };
 
-      <div className="mt-[30px]">
-        <h4 className="text-[18px] font-semibold">Select Service Category:</h4>
-        <div className="flex gap-3 mb-5">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              onClick={() => handleCategoryChange(category.name)}
-              className={`py-2 px-4 rounded ${selectedCategory === category.name ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            >
-              {category.name}
-            </button>
+  const ServiceCart = () => (
+    <div className="bg-gray-50 p-4 rounded-lg mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold flex items-center">
+          <ShoppingCart className="w-5 h-5 mr-2" />
+          Selected Services
+        </h3>
+        <span className="text-sm text-gray-500">
+          Total Duration: {calculateTotalDuration()} min
+        </span>
+      </div>
+      {selectedServices.length > 0 ? (
+        <div className="space-y-2">
+          {selectedServices.map((service) => (
+            <div key={service.id} className="flex items-center justify-between bg-white p-2 rounded">
+              <div>
+                <span className="font-medium">{service.name}</span>
+                <span className="text-sm text-gray-500 ml-2">{formatPrice(service.price)}</span>
+              </div>
+              <button
+                onClick={() => handleRemoveService(service.id)}
+                className="text-gray-400 hover:text-red-500"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           ))}
+          <div className="flex justify-between pt-3 border-t mt-3">
+            <span className="font-semibold">Total:</span>
+            <span className="font-bold">{formatPrice(calculateTotalPrice())}</span>
+          </div>
+          <button
+            onClick={handleProceedToStaff}
+            className="w-full mt-4 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Proceed to Select Staff
+          </button>
         </div>
+      ) : (
+        <p className="text-gray-500 text-sm">No services selected</p>
+      )}
+    </div>
+  );
 
-        {selectedCategory && (
-          <>
-            <h4 className="text-[18px] font-semibold">Select a Service:</h4>
-            <div className="grid gap-5 mb-5">
-              {services[selectedCategory].map(service => (
-                <div 
-                  key={service.id} 
-                  className="p-4 rounded-md border border-solid border-[#0066ff34] hover:shadow-md transition-all"
+  const ServiceSelection = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2">
+      {services.map((service) => (
+        <div
+          key={service.id}
+          onClick={() => handleServiceSelect(service)}
+          className="flex items-center p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all"
+        >
+          <img src={service.image} alt={service.name} className="w-16 h-16 rounded-lg object-cover" />
+          <div className="ml-4 flex-1">
+            <h3 className="font-semibold">{service.name}</h3>
+            <p className="text-sm text-gray-500">{service.duration}</p>
+            <p className="text-blue-600 font-semibold">{formatPrice(service.price)}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const BookingSteps = () => (
+    <div className="flex flex-wrap items-center justify-center mb-8 text-sm gap-4 px-2">
+      {[
+        { num: 1, text: "Services" },
+        { num: 2, text: "Staff" },
+        { num: 3, text: "Date & Time" },
+        { num: 4, text: "Confirm" }
+      ].map((step, index) => (
+        <div key={step.num} className="flex items-center">
+          <div className={`flex items-center ${currentStep >= step.num ? 'text-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 
+              ${currentStep >= step.num ? 'border-blue-600 bg-blue-50' : 'border-gray-300'}`}>
+              {step.num}
+            </div>
+            <span className="ml-2 hidden sm:inline">{step.text}</span>
+          </div>
+          {step.num < 4 && (
+            <div className={`w-8 sm:w-12 h-0.5 mx-2 ${currentStep > step.num ? 'bg-blue-600' : 'bg-gray-300'}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const StaffSelection = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2">
+      {staff.map((person) => (
+        <div
+          key={person.id}
+          onClick={() => handleStaffSelect(person)}
+          className="flex items-center p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all"
+        >
+          <img src={person.image} alt={person.name} className="w-16 h-16 rounded-full object-cover" />
+          <div className="ml-4">
+            <h3 className="font-semibold">{person.name}</h3>
+            <p className="text-sm text-gray-500">{person.role}</p>
+            <div className="flex items-center text-sm">
+              <span className="text-yellow-400">★</span>
+              <span className="ml-1">{person.rating}</span>
+              <span className="ml-2 text-gray-500">({person.reviews} reviews)</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const DateTimeSelection = () => (
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <h3 className="font-semibold flex items-center px-4">
+          <Calendar className="w-5 h-5 mr-2" />
+          Select Date
+        </h3>
+        <div className="relative">
+          <div className="flex overflow-x-auto scrollbar-hide pb-2 px-4 -mx-4 scroll-smooth">
+            <div className="flex space-x-2">
+              {getNextSevenDays().map((date) => (
+                <button
+                  key={date.full}
+                  onClick={() => handleDateSelect(date.full)}
+                  className={`flex flex-col items-center justify-center p-2 rounded-lg w-16 h-20
+                    ${selectedDate === date.full 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200'}`}
                 >
-                  <h4 className="text-[18px] leading-7 font-semibold text-headingColor">{service.name}</h4>
-                  <p className="text-[14px] leading-6 font-[400] text-textColor mt-2">{service.description}</p>
-                  <span className="text-[14px] leading-6 font-[400] text-textColor flex items-center gap-2">⏱️ {service.duration}</span>
-                  <span className="text-[16px] leading-7 lg:text-[18px] lg:leading-8 font-bold text-headingColor">${service.price}</span>
-                  <button 
-                    onClick={() => handleBookClick(service)}
-                    className="bg-primaryColor py-2 px-4 text-white text-[14px] leading-6 font-[600] rounded-md hover:bg-irisBlueColor transition-all mt-2"
-                  >
-                    Book Now
-                  </button>
-                </div>
+                  <span className="text-xs font-medium">{date.day}</span>
+                  <span className="text-lg font-bold mt-1">{date.date}</span>
+                </button>
               ))}
             </div>
-          </>
-        )}
+          </div>
+          <div className="hidden sm:block absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white pointer-events-none" />
+        </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Booking Details</h2>
-
-            {selectedServices.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold">Selected Services:</h3>
-                <ul className="list-disc ml-5 mt-2">
-                  {selectedServices.map((service, index) => (
-                    <li key={index} className="text-sm">
-                      {service.name} (by {service.barber.name}) - ${service.price}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <label className="block mb-2">Select Barber:</label>
-            <select
-              onChange={(e) => setSelectedBarber(barbers.find(barber => barber.id === parseInt(e.target.value)))}
-              className="border p-2 rounded w-full mb-3"
-            >
-              <option value="">Select Barber</option>
-              {barbers.map(barber => (
-                <option key={barber.id} value={barber.id}>
-                  {barber.name} ({barber.specialization}) - {barber.experience}
-                </option>
+      {selectedDate && (
+        <div className="space-y-4 px-4">
+          <h3 className="font-semibold">Select Time</h3>
+          <div className="relative">
+            <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-6 gap-2 max-h-[280px] overflow-y-auto pr-2">
+              {timeSlots.map((time) => (
+                <button
+                  key={time}
+                  onClick={() => handleTimeSelect(time)}
+                  className={`p-3 rounded text-sm font-medium transition-colors
+                    ${selectedTime === time 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200'}`}
+                >
+                  {time}
+                </button>
               ))}
-            </select>
-
-            <label className="block mb-2">Select Date:</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="border p-2 rounded w-full mb-3"
-            />
-
-            <label className="block mb-2">Select Time:</label>
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="border p-2 rounded w-full mb-3"
-            />
-
-            <label className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                checked={emailReminder}
-                onChange={() => setEmailReminder(!emailReminder)}
-                className="mr-2"
-              />
-              Send me a reminder via email/SMS
-            </label>
-
-            <button 
-              onClick={handleAddService}
-              className="bg-secondaryColor py-2 px-4 text-white rounded-md w-full mt-3"
-            >
-              Add Another Service
-            </button>
-
-            <button 
-              onClick={handleConfirmBooking}
-              className="bg-primaryColor py-2 px-4 text-white rounded-md w-full mt-3"
-            >
-              Confirm Booking
-            </button>
-
-            <button 
-              onClick={handleModalClose}
-              className="bg-gray-300 py-2 px-4 text-black rounded-md w-full mt-3"
-            >
-              Cancel
-            </button>
+            </div>
+            <div className="absolute bottom-0 left-0 right-2 h-8 bg-gradient-to-t from-white pointer-events-none" />
           </div>
         </div>
       )}
     </div>
   );
+
+  const Confirmation = () => (
+    <div className="space-y-6 px-2">
+      <div className="bg-blue-50 p-4 rounded-lg">
+        <h3 className="font-semibold mb-4">Booking Summary</h3>
+        <div className="space-y-3">
+          <div>
+            <span className="text-gray-600">Services:</span>
+            <div className="mt-2 space-y-2">
+              {selectedServices.map(service => (
+                <div key={service.id} className="flex justify-between text-sm">
+                  <span>{service.name}</span>
+                  <span className="font-semibold">{formatPrice(service.price)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Staff:</span>
+            <span className="font-semibold">{selectedStaff?.name}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Date:</span>
+            <span className="font-semibold">
+              {new Date(selectedDate).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Time:</span>
+            <span className="font-semibold">{selectedTime}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span className="text-gray-600">Total Duration:</span>
+            <span className="font-semibold">{calculateTotalDuration()} min</span>
+          </div>
+          <div className="flex justify-between pt-3 border-t">
+            <span className="text-gray-600">Total Price:</span>
+            <span className="font-bold text-lg">{formatPrice(calculateTotalPrice())}</span>
+          </div>
+        </div>
+      </div>
+
+      <button 
+        onClick={() => alert('Booking confirmed!')}
+        className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Confirm Booking
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="max-w-3xl mx-auto p-4">
+      <BookingSteps />
+      
+      <div className="mt-8">
+        {currentStep === 1 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Select Services</h2>
+            <ServiceCart />
+            <ServiceSelection />
+          </>
+        )}
+
+        {currentStep === 2 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Select Staff</h2>
+            <StaffSelection />
+          </>
+        )}
+
+        {currentStep === 3 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Select Date & Time</h2>
+            <DateTimeSelection />
+          </>
+        )}
+
+        {currentStep === 4 && (
+          <>
+            <h2 className="text-2xl font-bold mb-6 px-2">Confirm Booking</h2>
+            <Confirmation />
+          </>
+        )}
+      </div>
+
+      {currentStep > 1 && (
+        <button
+          onClick={() => setCurrentStep(currentStep - 1)}
+          className="mt-6 text-blue-500 hover:text-blue-600 px-2"
+        >
+          ← Back to previous step
+        </button>
+      )}
+    </div>
+  );
 };
 
-export default BarberServices;
+export default BookingSystem;
