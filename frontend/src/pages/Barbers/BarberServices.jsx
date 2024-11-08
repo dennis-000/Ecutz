@@ -1,13 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import { Calendar, ShoppingCart, X } from 'lucide-react';
+import service1 from '../../assets/images/classicFade.jpg';
 
 const BookingSystem = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedServices, setSelectedServices] = useState([]);
-  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   
 
   // Sample data with prices in Ghanaian Cedis
@@ -17,7 +18,7 @@ const BookingSystem = () => {
       name: "Men's Haircut",
       duration: "30 min",
       price: 150,
-      image: "/api/placeholder/100/100"
+      image: service1,
     },
     {
       id: 2,
@@ -41,32 +42,15 @@ const BookingSystem = () => {
       image: "/api/placeholder/100/100"
     }
   ];
-
-  const staff = [
-    {
-      id: 1,
-      name: "John Smith",
-      role: "Master Barber",
-      rating: 4.9,
-      reviews: 128,
-      image: "/api/placeholder/100/100"
-    },
-    {
-      id: 2,
-      name: "Mike Johnson",
-      role: "Senior Barber",
-      rating: 4.8,
-      reviews: 95,
-      image: "/api/placeholder/100/100"
-    }
-  ];
-
   const calculateTotalDuration = () => {
     return selectedServices.reduce((total, service) => {
-      const duration = parseInt(service.duration);
-      return total + duration;
+      const duration = parseInt(service.duration.split(' ')[0], 10); // Extract numeric value
+      return total + (isNaN(duration) ? 0 : duration);
     }, 0);
   };
+  
+ 
+  
 
   const calculateTotalPrice = () => {
     return selectedServices.reduce((total, service) => total + service.price, 0);
@@ -103,8 +87,11 @@ const BookingSystem = () => {
   };
 
   const handleServiceSelect = (service) => {
-    setSelectedServices(prev => [...prev, service]);
+    setSelectedServices(prev => 
+      prev.find(s => s.id === service.id) ? prev : [...prev, service]
+    );
   };
+  
 
   const handleRemoveService = (serviceId) => {
     setSelectedServices(prev => prev.filter(service => service.id !== serviceId));
@@ -116,8 +103,8 @@ const BookingSystem = () => {
     }
   };
 
-  const handleStaffSelect = (staffMember) => {
-    setSelectedStaff(staffMember);
+  const handlePaymentMethodSelect = (method) => {
+    setSelectedPaymentMethod(method);
     setCurrentStep(3);
   };
 
@@ -157,6 +144,7 @@ const BookingSystem = () => {
               </button>
             </div>
           ))}
+
           <div className="flex justify-between pt-3 border-t mt-3">
             <span className="font-semibold">Total:</span>
             <span className="font-bold">{formatPrice(calculateTotalPrice())}</span>
@@ -165,7 +153,7 @@ const BookingSystem = () => {
             onClick={handleProceedToStaff}
             className="w-full mt-4 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
           >
-            Proceed to Select Staff
+            Proceed to Payment Method
           </button>
         </div>
       ) : (
@@ -192,14 +180,29 @@ const BookingSystem = () => {
       ))}
     </div>
   );
+  const PaymentMethodSelection = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-2">
+      {["Cash", "Mobile Money", "Card"].map((method) => (
+        <div
+          key={method}
+          onClick={() => handlePaymentMethodSelect(method)}
+          className={`p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all
+            ${selectedPaymentMethod === method ? 'border-blue-500' : 'border-gray-300'}`}
+        >
+          <h3 className="font-semibold">{method}</h3>
+        </div>
+      ))}
+    </div>
+  );
 
   const BookingSteps = () => (
     <div className="flex flex-wrap items-center justify-center mb-8 text-sm gap-4 px-2">
       {[
         { num: 1, text: "Services" },
-        { num: 2, text: "Staff" },
+        { num: 2, text: "Payment Method" },
         { num: 3, text: "Date & Time" },
         { num: 4, text: "Confirm" }
+      // eslint-disable-next-line no-unused-vars
       ].map((step, index) => (
         <div key={step.num} className="flex items-center">
           <div className={`flex items-center ${currentStep >= step.num ? 'text-blue-600' : 'text-gray-400'}`}>
@@ -217,28 +220,7 @@ const BookingSystem = () => {
     </div>
   );
 
-  const StaffSelection = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2">
-      {staff.map((person) => (
-        <div
-          key={person.id}
-          onClick={() => handleStaffSelect(person)}
-          className="flex items-center p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all"
-        >
-          <img src={person.image} alt={person.name} className="w-16 h-16 rounded-full object-cover" />
-          <div className="ml-4">
-            <h3 className="font-semibold">{person.name}</h3>
-            <p className="text-sm text-gray-500">{person.role}</p>
-            <div className="flex items-center text-sm">
-              <span className="text-yellow-400">★</span>
-              <span className="ml-1">{person.rating}</span>
-              <span className="ml-2 text-gray-500">({person.reviews} reviews)</span>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+ 
 
   const DateTimeSelection = () => (
     <div className="space-y-6">
@@ -299,21 +281,27 @@ const BookingSystem = () => {
       <div className="bg-blue-50 p-4 rounded-lg">
         <h3 className="font-semibold mb-4">Booking Summary</h3>
         <div className="space-y-3">
+
+          {/* ===== Display name of Service selected even multiple with their prices ====== */}
           <div>
             <span className="text-gray-600">Services:</span>
             <div className="mt-2 space-y-2">
               {selectedServices.map(service => (
-                <div key={service.id} className="flex justify-between text-sm">
+                <div key={service.id} className="flex justify-between text-sm font-semibold">
                   <span>{service.name}</span>
                   <span className="font-semibold">{formatPrice(service.price)}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-            <span className="text-gray-600">Staff:</span>
-            <span className="font-semibold">{selectedStaff?.name}</span>
+
+          {/* ==== Display Payment Method ===== */}
+          <div className='flex flex-col sm:flex-row sm:justify-between gap-1'>
+            <span className="text-gray-600">Payment Method:</span>
+            <span className="font-semibold">{selectedPaymentMethod}</span>
           </div>
+
+          {/* ===== Display Time and Date */}
           <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="text-gray-600">Date:</span>
             <span className="font-semibold">
@@ -329,18 +317,24 @@ const BookingSystem = () => {
             <span className="text-gray-600">Time:</span>
             <span className="font-semibold">{selectedTime}</span>
           </div>
+          {/* ===== Display Duration ======== */}
           <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
             <span className="text-gray-600">Total Duration:</span>
             <span className="font-semibold">{calculateTotalDuration()} min</span>
           </div>
+
+          {/* ===== Display Total Prices of Serevices ======= */}
           <div className="flex justify-between pt-3 border-t">
             <span className="text-gray-600">Total Price:</span>
             <span className="font-bold text-lg">{formatPrice(calculateTotalPrice())}</span>
           </div>
         </div>
       </div>
-
-      <button 
+      
+              {/* === confirm Booking ===== */}
+              {/* ====== Later the Booking Button will lead to Payment Gateway */}
+              {/* ==== for now just gives an alert */}
+      <button
         onClick={() => alert('Booking confirmed!')}
         className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
       >
@@ -349,6 +343,8 @@ const BookingSystem = () => {
     </div>
   );
 
+
+  // =========
   return (
     <div className="max-w-3xl mx-auto p-4">
       <BookingSteps />
@@ -364,8 +360,8 @@ const BookingSystem = () => {
 
         {currentStep === 2 && (
           <>
-            <h2 className="text-2xl font-bold mb-6 px-2">Select Staff</h2>
-            <StaffSelection />
+            <h2 className="text-2xl font-bold mb-6 px-2">Payment Method</h2>
+            <PaymentMethodSelection />
           </>
         )}
 
@@ -393,7 +389,9 @@ const BookingSystem = () => {
         </button>
       )}
     </div>
+  
   );
+
 };
 
 export default BookingSystem;

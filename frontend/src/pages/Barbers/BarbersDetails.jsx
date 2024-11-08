@@ -4,7 +4,6 @@ import doctorImg from '../../assets/images/doctor-img02.png';
 import BarberAbout from './BarberAbout';
 import Feedback from './Feedback';
 import SidePanel from './SidePanel';
-import SuggestionsPanel from './SuggestionsPanel';
 import BarberServices from './BarberServices';
 import BarberGallery from './BarberGallery';
 
@@ -86,9 +85,7 @@ const BarbersDetails = () => {
             <SidePanel />
           </div>
 
-          <div>
-            <SuggestionsPanel />
-          </div>
+          
         </div> 
       </div>
 
