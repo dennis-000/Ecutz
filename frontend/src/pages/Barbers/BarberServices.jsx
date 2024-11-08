@@ -42,13 +42,14 @@ const BookingSystem = () => {
       image: "/api/placeholder/100/100"
     }
   ];
-    
   const calculateTotalDuration = () => {
     return selectedServices.reduce((total, service) => {
-      const duration = parseInt(service.duration, 10);
+      const duration = parseInt(service.duration.split(' ')[0], 10); // Extract numeric value
       return total + (isNaN(duration) ? 0 : duration);
     }, 0);
   };
+  
+ 
   
 
   const calculateTotalPrice = () => {
@@ -201,6 +202,7 @@ const BookingSystem = () => {
         { num: 2, text: "Payment Method" },
         { num: 3, text: "Date & Time" },
         { num: 4, text: "Confirm" }
+      // eslint-disable-next-line no-unused-vars
       ].map((step, index) => (
         <div key={step.num} className="flex items-center">
           <div className={`flex items-center ${currentStep >= step.num ? 'text-blue-600' : 'text-gray-400'}`}>
@@ -333,7 +335,7 @@ const BookingSystem = () => {
               {/* ====== Later the Booking Button will lead to Payment Gateway */}
               {/* ==== for now just gives an alert */}
       <button
-        // onClick={() => alert('Booking confirmed!')}
+        onClick={() => alert('Booking confirmed!')}
         className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
       >
         Confirm Booking
