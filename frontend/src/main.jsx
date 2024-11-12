@@ -13,12 +13,22 @@ import './index.css';
 // Importing BrowserRouter from react-router-dom to handle routing in the app
 import { BrowserRouter } from 'react-router-dom';
 
+import { ToastContainer } from 'react-toastify';
+ import "react-toastify/dist/ReactToastify.css";
+
 // Rendering the root element of the React app into the 'root' DOM element
 createRoot(document.getElementById('root')).render(
   // Wrapping the app in StrictMode to check for potential problems
   <StrictMode>
     {/* Wrapping the app with BrowserRouter to enable routing in the app */}
     <BrowserRouter>
+    <ToastContainer 
+    theme='dark'
+    position='top-right' 
+    autoClose= {3000} 
+    closeOnClick 
+    pauseOnHover={false}
+    />
       <App /> {/* The main App component that contains the app's layout and routes */}
     </BrowserRouter>
   </StrictMode>,
