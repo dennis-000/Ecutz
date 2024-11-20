@@ -3,7 +3,8 @@ import User from "../models/user.model.js";
 import { hashPassword } from "../server.js";
 import { createAuditLog } from './audit.controller.js';
 import fs from 'fs'
-import multer from 'multer';
+import cloudinary from '../config/cloudinary.config.js';
+import upload from '../config/upload.config.js';
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -57,6 +58,7 @@ export const getSingleUserById = async (req, res) => {
 export const createNewUser = async (req, res) => {
     try {
         const { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
+        const imagePath = req.file.path
 
         const existingUser = await User.findOne({ email })
 
@@ -66,6 +68,11 @@ export const createNewUser = async (req, res) => {
         
         const hash = await hashPassword(password)
 
+        // Upload image to Cloudinary with a specified folder
+        const result = await cloudinary.uploader.upload(imagePath, {
+            folder: 'ecutz/profilePictures'  // Specify your folder here
+        });
+
         const newUser = new User({
             name,
             email,
@@ -74,12 +81,15 @@ export const createNewUser = async (req, res) => {
             phone,
             location,
             status: role === "provider" ? "inactive" : "active",
-            profilePicture: req.file ? `uploads/profilePictures/${req.file.filename}` : null,
+            profilePicture: req.file ? result.secure_url : null,
         })
 
         const newCreatedUser = await newUser.save()
 
-        await createAuditLog(req.user ? req.user._id : "system", newCreatedUser._id, "User", "create", "User created"); //Log user creation
+        fs.unlinkSync(imagePath);
+        console.log(req.user);
+
+        await createAuditLog(req.user ? req.user.id : "system", newCreatedUser._id, "User", "create", "New User was created"); //Log user creation
 
         res.status(201).json({success: true, message: "User created successfully", data: newCreatedUser})
     } catch (error) {
@@ -147,7 +157,7 @@ export const updateUser = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", id, `User", "update", "Updated user with changes: ${JSON.stringify(updatedUser)}`);
+        await createAuditLog(req.user ? req.user.id : "system", id, `User", "update", "Updated user with changes: ${JSON.stringify(updatedUser)}`);
 
         res.status(200).json({success: true, message: "User Updated successfully", data: newUpdatedUser,})
     } catch(error) {
@@ -176,7 +186,7 @@ export const deleteUser = async (req, res) => {
             fs.unlinkSync(path.join(__dirname, deletedUser.profilePicture));
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", deletedUser._id, "User", "delete", "User Deleted"); //Log user deletion
+        await createAuditLog(req.user ? req.user.id : "system", deletedUser._id, "User", "delete", "User Deleted"); //Log user deletion
 
         res.status(200).json({success: true, message: "User Deleted successfully"})
     } catch (error) {
