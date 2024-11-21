@@ -10,8 +10,8 @@ userRouter.get("/", getAllUsers)
 userRouter.get("/providers", getAllProviders)//Get all providers
 userRouter.get("/customers", getAllCustomers)//Get all customers
 userRouter.get("/:id", getSingleUserById)//Get a single user
-userRouter.post("/", requireAuth, upload.single("profilePicture"), createNewUser)
-userRouter.patch("/:id", upload.single("profilePicture"), updateUser)
-userRouter.delete("/:id", deleteUser)
+userRouter.post("/", upload.single("profilePicture"), createNewUser)
+userRouter.patch("/:id", requireAuth, upload.single("profilePicture"), updateUser)
+userRouter.delete("/:id",requireAuth, deleteUser)
 
 export default userRouter

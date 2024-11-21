@@ -10,7 +10,10 @@ const UserSchema = new mongoose.Schema({
     default: "customer",
   },
   phone: { type: String },
-  profilePicture: { type: String },
+  profilePicture: {
+    url: { type: String },
+    public_id: { type: String }
+  },
   // Only for providers
   servicesOffered: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }], // Reference to Service model
   bio: { type: String }, // Provider's bio

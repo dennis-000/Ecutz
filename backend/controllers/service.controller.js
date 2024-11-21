@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import Service from "../models/service.model.js";
+import { createAuditLog } from "./audit.controller.js";
 
 export const getAllServices = async (req, res) => {
     try {
-        const services = await Service.find({})
+        const services = await Service.find({}).sort({ timestamp : -1 })
         res.status(200).json({success: true, data: services, message: "Services retrieved successfully"})
     } catch (error) {
         console.log("Error in fetching services: ", error.message);
@@ -33,18 +34,24 @@ export const getSingleService = async (req, res) => {
 export const createNewService = async (req, res) => {
     const request = req.body
 
-    const existingService = await Service.findOne({ title: request.title })
+    if (!request.title || !request.description || !request.category) {
+        return res.status(400).json({ success: false, message: "Title, description, and category are required" });
+    }
+
+    try {
+    const existingService = await Service.findOne({ title: new RegExp(`^${request.title}$`, 'i') })
 
     if(existingService){
         return res.status(400).json({success: false, message: "Service already exists"})
     }
-    
     const newService = new Service(request)
-
-    try {
-        await newService.save()
-
-        await createAuditLog(req.user ? req.user._id : "system", newService._id, "Service", "create", "Service created"); //Log user creation
+    
+    await newService.save()
+    
+    console.log(`User ID: ${ req.user.id }`, `ID: ${ newService._id }`);
+    // console.log("Does not already exist");
+    
+        await createAuditLog(req.user ? req.user.id : "system", newService._id, "Service", "create", "Service created"); //Log user creation
 
         res.status(201).json({success: true, message: "Service created successfully", data: newService})
     } catch (error) {
@@ -69,7 +76,7 @@ export const updateService = async (req, res) => {
             return res.status(404).json({ success: false, message: "Service not found" });
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", id, "Service", "update", `Service updated with changes: ${JSON.stringify(service)}`);
+        await createAuditLog(req.user ? req.user.id : "system", id, "Service", "update", `Service updated with changes: ${JSON.stringify(service)}`);
 
         res.status(200).json({success: true, message: "Service Updated successfully", data: updatedService})
     } catch(error) {
@@ -92,9 +99,9 @@ export const deleteService = async (req, res) => {
             return res.status(404).json({ success: false, message: "Service not found" });
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", id, "Service", "delete", `Service deleted`);
+        await createAuditLog(req.user ? req.user.id : "system", id, "Service", "delete", `Service deleted`);
         
-        res.status(200).json({success: true, message: "Service Deleted successfully"})
+        res.status(200).json({success: true, message: "Service Deleted successfully", data: deleteService})
 
     } catch (error) {
         console.log(`Error occurred while deleting service with id${id}: ${error.message}`)

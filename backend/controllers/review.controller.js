@@ -40,7 +40,7 @@ export const createNewReview = async (req, res) => {
     try {
         await newReview.save()
 
-        await createAuditLog(req.user ? req.user._id : "system", newReview._id, "Review", "create", "Review created");
+        await createAuditLog(req.user ? req.user.id : "system", newReview._id, "Review", "create", "Review created");
 
         res.status(201).json({success: true, message: "Review created successfully"})
     } catch (error) {
@@ -61,7 +61,7 @@ export const updateReview = async (req, res) => {
     try{
         const newReview = await Review.findByIdAndUpdate(id, request, { new: true })
 
-        await createAuditLog(req.user ? req.user._id : "system", newReview._id, "Review", "update", `Review updated with changes: ${JSON.stringify(newReview)}`);
+        await createAuditLog(req.user ? req.user.id : "system", newReview._id, "Review", "update", `Review updated with changes: ${JSON.stringify(newReview)}`);
 
         res.status(200).json({success: true, message: "Review updated successfully", data: newReview})
     } catch(error) {
@@ -81,7 +81,7 @@ export const deleteReview = async (req, res) => {
     try {
         const newReview = await Review.findByIdAndDelete(id)
 
-        await createAuditLog(req.user ? req.user._id : "system", newReview._id, "Review", "delete", "Review deleted");
+        await createAuditLog(req.user ? req.user.id : "system", newReview._id, "Review", "delete", "Review deleted");
 
         res.status(200).json({success: true, message: "Review Deleted successfully"})
 
