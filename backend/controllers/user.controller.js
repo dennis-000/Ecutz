@@ -144,6 +144,7 @@ export const updateUser = async (req, res) => {
             url: result.secure_url,
             public_id: result.public_id,
         };
+        fs.unlinkSync(req.file.path);
     }
 
     let hash = user.password

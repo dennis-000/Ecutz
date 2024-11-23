@@ -15,6 +15,7 @@ import cors from 'cors'
 import loginRouter from "./routes/auth.routes.js"
 import cookieParser from "cookie-parser"
 import cloudinary from "./config/cloudinary.config.js"
+import galleryRouter from "./routes/gallery.routes.js"
 
 dotenv.config()
 
@@ -32,6 +33,7 @@ app.use("/api/provider-services", providerServiceRouter)
 app.use("/api/audit-logs", auditRouter)
 app.use("/api/appointments", appointmentRouter)
 app.use("/api", loginRouter)
+app.use("/api/users", galleryRouter)
 
 //cron job
 // Start background job
