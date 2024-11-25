@@ -24,17 +24,54 @@ import multer from 'multer'
 import fs from 'fs'
 import path from 'path';
 
+// Create directories for uploads if they don't exist
+const createDirectory = (dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+};
+
+const profilePictureDir = "uploads/profilePictures";
+const galleryDir = "uploads/gallery";
+
+createDirectory(profilePictureDir);
+createDirectory(galleryDir);
+
 
 // Set up Multer to temporarily store files locally
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Specify a local folder to temporarily store images
+    // Determine the destination folder based on the field name
+    if (file.fieldname === "profilePicture") {
+      cb(null, profilePictureDir); // Profile picture folder
+    } else if (file.fieldname === "galleryImages") {
+      cb(null, galleryDir); // Gallery folder
+    } else {
+      cb(new Error("Invalid field name"), null);
+    }
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Use a unique filename
-  }
+    // Generate a unique filename
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  },
 });
 
-const upload = multer({ storage: storage });
+// File type validation
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Unsupported file type. Only JPEG, PNG, and JPG are allowed."));
+  }
+};
+
+// Configure upload instance
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max per file
+});
 
 export default upload

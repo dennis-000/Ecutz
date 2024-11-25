@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import ProviderService from "../models/providerService.model.js";
+import { createAuditLog } from "./audit.controller.js";
 
 export const getAllProviderService =  async (req, res) => {
     try {
@@ -47,7 +48,7 @@ export const createNewProviderService = async (req, res) => {
         const newProviderService = new ProviderService(request)
         await newProviderService.save()
 
-        await createAuditLog(req.user ? req.user._id : "system", newProviderService._id, "ProviderService", "create", "Provider Service created"); //Log provider service creation
+        await createAuditLog(req.user ? req.user.id : "system", newProviderService._id, "ProviderService", "create", "Provider Service created"); //Log provider service creation
 
         res.status(201).json({success: true, message: "Provider Service created successfully", data: newProviderService})
     } catch (error) {
@@ -72,7 +73,7 @@ export const updateProviderService = async (req, res) => {
             return res.status(404).json({ success: false, message: "Service not found" });
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", id, "ProviderService", "update", `Provider Service updated with changes: ${JSON.stringify(updatedProviderService)}`);
+        await createAuditLog(req.user ? req.user.id : "system", id, "ProviderService", "update", `Provider Service updated with changes: ${JSON.stringify(updatedProviderService)}`);
 
         res.status(200).json({success: true, message: "Provider Service Updated successfully", data: updatedProviderService})
     } catch(error) {
@@ -92,7 +93,7 @@ export const deleteProviderService = async (req, res) => {
     try {
         await ProviderService.findByIdAndDelete(id)
 
-        await createAuditLog(req.user ? req.user._id : "system", id, "ProviderService", "delete", `Provider Service deleted`);
+        await createAuditLog(req.user ? req.user.id : "system", id, "ProviderService", "delete", `Provider Service deleted`);
         
         res.status(200).json({success: true, message: "Provider Service Deleted successfully"})
 

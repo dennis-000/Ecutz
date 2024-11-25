@@ -57,7 +57,7 @@ export const getSingleUserById = async (req, res) => {
 
 export const createNewUser = async (req, res) => {
     try {
-        const { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
+        let { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
         const imagePath = req.file.path
 
         const existingUser = await User.findOne({ email })
@@ -73,6 +73,11 @@ export const createNewUser = async (req, res) => {
             folder: 'ecutz/profilePictures'  // Specify your folder here
         });
 
+        profilePicture = {
+            url: result.secure_url,
+            public_id: result.public_id
+        }
+
         const newUser = new User({
             name,
             email,
@@ -81,7 +86,7 @@ export const createNewUser = async (req, res) => {
             phone,
             location,
             status: role === "provider" ? "inactive" : "active",
-            profilePicture: req.file ? result.secure_url : null,
+            profilePicture: req.file ? profilePicture : null,
         })
 
         const newCreatedUser = await newUser.save()
@@ -102,7 +107,7 @@ export const updateUser = async (req, res) => {
     try{
     const { id } = req.params
 
-    const { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
+    let { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({success:false, message: "Invalid User ID"})
@@ -123,15 +128,23 @@ export const updateUser = async (req, res) => {
     }
 
      // Update profile picture if provided and delete the old one
-     const updatedProfilePic = user.profilePicture
+     let updatedProfilePic = user.profilePicture
      if (req.file) {
-        // Delete old profile picture if it exists
-        if (user.profilePicture && fs.existsSync(path.join(__dirname, `${user.profilePicture}`))) {
-            fs.unlinkSync(path.join(__dirname, `${user.profilePicture}`));
+        // Delete old profile picture from cloudinary if it exists
+        if (user.profilePicture && user.profilePicture.public_id) {
+            await cloudinary.uploader.destroy(user.profilePicture.public_id);
         }
         
         // Update with new profile picture
-        updatedProfilePic = `uploads/profilePictures/${req.file.filename}`;
+        // Upload new profile picture to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'ecutz/profilePictures',
+        });
+        updatedProfilePic = {
+            url: result.secure_url,
+            public_id: result.public_id,
+        };
+        fs.unlinkSync(req.file.path);
     }
 
     let hash = user.password
@@ -147,6 +160,7 @@ export const updateUser = async (req, res) => {
         phone: phone || user.phone,
         location: location || user.location,
         status: status || user.status,
+        verified: verified || user.verified,
         profilePicture: req.file ? updatedProfilePic : profilePicture,
     }
 
@@ -156,8 +170,8 @@ export const updateUser = async (req, res) => {
         if (!newUpdatedUser) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
-
-        await createAuditLog(req.user ? req.user.id : "system", id, `User", "update", "Updated user with changes: ${JSON.stringify(updatedUser)}`);
+        console.log(`User ID: ${req.user.id}`, `Id: ${id}`);
+        await createAuditLog(req.user.id, id, "User", "update", `Updated user with changes: ${JSON.stringify(updatedUser)}`);
 
         res.status(200).json({success: true, message: "User Updated successfully", data: newUpdatedUser,})
     } catch(error) {
@@ -181,12 +195,12 @@ export const deleteUser = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-         // Delete profile picture if it exists
-         if (deletedUser.profilePicture && fs.existsSync(path.join(__dirname, deletedUser.profilePicture))) {
-            fs.unlinkSync(path.join(__dirname, deletedUser.profilePicture));
+        // Delete profile picture if it exists
+        if (deletedUser.profilePicture && deletedUser.profilePicture.public_id) {
+            await cloudinary.uploader.destroy(deletedUser.profilePicture.public_id);
         }
 
-        await createAuditLog(req.user ? req.user.id : "system", deletedUser._id, "User", "delete", "User Deleted"); //Log user deletion
+        await createAuditLog(req.user.id, deletedUser._id, "User", "delete", "User Deleted"); //Log user deletion
 
         res.status(200).json({success: true, message: "User Deleted successfully"})
     } catch (error) {
