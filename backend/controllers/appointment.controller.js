@@ -43,7 +43,7 @@ export const createAppointment = async (req, res) => {
     try {
         await newAppointment.save()
 
-        await createAuditLog(req.user ? req.user._id : "system", newAppointment._id, "Appointment", "create", "Appointment created");
+        await createAuditLog(req.user ? req.user.id : "system", newAppointment._id, "Appointment", "create", "Appointment created");
 
         res.status(201).json({success: true, message: "Appointment created successfully"})
     } catch (error) {
@@ -68,7 +68,7 @@ export const updateAppointment = async (req, res) => {
             return res.status(404).json({ success: false, message: "Appointment not found" });
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", id, "Appointment", "update", `Appointment updated with changes: ${JSON.stringify(updatedAppointment)}`);
+        await createAuditLog(req.user ? req.user.id : "system", id, "Appointment", "update", `Appointment updated with changes: ${JSON.stringify(updatedAppointment)}`);
 
         res.status(200).json({success: true, message: "Appointment Updated successfully", data: updatedAppointment})
     } catch(error) {
@@ -92,7 +92,7 @@ export const deleteAppointment = async (req, res) => {
             return res.status(404).json({ success: false, message: "Appointment not found" });
         }
 
-        await createAuditLog(req.user ? req.user._id : "system", id, "Appointment", "delete", `Appointment deleted`);
+        await createAuditLog(req.user ? req.user.id : "system", id, "Appointment", "delete", `Appointment deleted`);
 
         res.status(200).json({success: true, message: "Appointment Deleted successfully"})
 
