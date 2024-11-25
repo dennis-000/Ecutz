@@ -14,7 +14,8 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ToastContainer } from 'react-toastify';
- import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css";
+import { AuthContextProvider } from './context/AuthContext.jsx';
 
 // Rendering the root element of the React app into the 'root' DOM element
 createRoot(document.getElementById('root')).render(
@@ -22,14 +23,16 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* Wrapping the app with BrowserRouter to enable routing in the app */}
     <BrowserRouter>
-    <ToastContainer 
-    theme='dark'
-    position='top-right' 
-    autoClose= {3000} 
-    closeOnClick 
-    pauseOnHover={false}
-    />
-      <App /> {/* The main App component that contains the app's layout and routes */}
+      <AuthContextProvider>
+        <ToastContainer 
+        theme='dark'
+        position='top-right' 
+        autoClose= {3000} 
+        closeOnClick 
+        pauseOnHover={false}
+        />
+          <App /> {/* The main App component that contains the app's layout and routes */}
+        </AuthContextProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 );

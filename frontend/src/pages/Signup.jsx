@@ -21,11 +21,12 @@ const Signup = () => {
   
   // Main form data state with initial values
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
-    photo: selectedFile,  // Links the photo to the selected file
+    profilePicture: selectedFile,  // Links the photo to the selected file
     gender: '',
-    role: 'user',        // Default role set to 'user'
+    role: 'customer',        // Default role set to 'user'
   });
 
   // Hook for programmatic navigation
@@ -62,10 +63,10 @@ const Signup = () => {
 
 
 
-  // Form submission handler
-  const submitHandler = async event => {
-    event.preventDefault();  // Prevent default form submission
-
+ // Form submission handler
+ const submitHandler = async event => {
+  event.preventDefault();  // Prevent default form submission
+  
     // Password validation checks
     // Check 1: Password length validation
     if (formData.password.length < 6) {
@@ -82,10 +83,15 @@ const Signup = () => {
     setLoading(true)  // Start loading state
 
     //=======================================================
+
+  //    // Form submission handler
+  // const submitHandler = async event => {
+  //   event.preventDefault();  // Prevent default form submission
+
     try {
       //must need backend API to fetch
       // Send registration request to backend
-      const res = await fetch(`${BASE_URL}/auth/register`,{
+      const res = await fetch(`${BASE_URL}users`,{
         method:'post',
         headers:{
           'Content-Type':'application/json'
@@ -211,8 +217,8 @@ const Signup = () => {
                     className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3
                       focus:outline-none"
                   >
-                    <option value="barber">Barber/Stylist</option>
-                    <option value="user">User</option>
+                    <option value="provider">Barber/Stylist</option>
+                    <option value="customer">User</option>
                   </select>
                 </label>
                 

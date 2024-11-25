@@ -1,16 +1,74 @@
-import {useState} from 'react';
-import { Link } from 'react-router-dom';
+import {useState, useContext} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../config';
+import { toast } from 'react-toastify';
+import {AuthContext} from '../context/AuthContext.jsx'
 
 const Login = () => {
 
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
-  })
+    password: '' ,
+  });
+
+  // loading State
+  // eslint-disable-next-line no-unused-vars
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const {dispatch} = useContext(AuthContext)
 
   const handleInputChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   };
+
+        //========================
+       // Form submission handler
+       const submitHandler = async event => {
+        event.preventDefault();  // Prevent default form submission
+    
+        try {
+          //must need backend API to fetch
+          // Send registration request to backend
+          const res = await fetch(`${BASE_URL}/login`,{
+            method:'post',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body: JSON.stringify(formData)  // Send form data as JSON
+          })
+          //======================================================
+    
+          //=========== LOGICS ===================================
+          const result = await res.json()  // Extract message from response
+    
+          // Handle unsuccessful registration
+          if(!res.ok){
+            throw new Error(result.message);
+          }
+
+          //After succesfull login
+          dispatch({
+            type:'LOGIN_SUCCESS',
+            payload:{
+              user:result.data,
+              token:result.token,
+              role:result.role,
+            },
+          });
+
+          console.log(result, 'login data');
+    
+          // Handle successful registration
+          setLoading(false)
+          toast.success(result.message)  // Show success message
+          navigate('/home')      // Redirect to login page
+        
+        } catch (err) {
+          // Handle registration errors
+          toast.error(err.message)  // Show error message
+          setLoading(false)         // Stop loading state
+        }
+      };
 
   return (
     <section className='px-5 lg:px-0'>
@@ -19,7 +77,7 @@ const Login = () => {
           Hello!  <span className='text-primaryColor'>Welcome</span>  Back 🎉
         </h3>
 
-        <form className="py-4 md:py-0">
+        <form className="py-4 md:py-0" onSubmit={submitHandler}>
           {/* ===== EMAIL ===== */}
           <div className='mb-5'>
             <input
