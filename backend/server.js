@@ -16,6 +16,8 @@ import loginRouter from "./routes/auth.routes.js"
 import cookieParser from "cookie-parser"
 import cloudinary from "./config/cloudinary.config.js"
 import galleryRouter from "./routes/gallery.routes.js"
+import { updateAverageRating } from "./controllers/rating.controller.js"
+import ratingRouter from "./routes/rating.routes.js"
 
 dotenv.config()
 
@@ -34,10 +36,12 @@ app.use("/api/audit-logs", auditRouter)
 app.use("/api/appointments", appointmentRouter)
 app.use("/api", loginRouter)
 app.use("/api/users", galleryRouter)
+app.use("/api/rating", ratingRouter)
 
 //cron job
 // Start background job
 cron.schedule('* * * * *', updateExpiredAppointments); // Every minute
+cron.schedule("0 0 * * *", updateAverageRating);
 
 //function to hash passwords
 export const hashPassword = async (password) => {

@@ -31,21 +31,20 @@ export const getSingleAppointment = async (req, res) => {
 
 export const createAppointment = async (req, res) => {
     const request = req.body
-
-    const existingAppointment = await Appointment.findOne({ customer: request.customer, provider: request.provider, date: request.date })
-
-    if(existingAppointment && appointmentIsActive(existingAppointment)){
-        return res.status(400).json({success: false, message: "Appointment already exists for the selected date"})
-    }
-    
-    const newAppointment = new Appointment(request)
-
+    request.customer = req.user.id
     try {
-        await newAppointment.save()
+        const existingAppointment = await Appointment.findOne({ customer: request.customer, provider: request.provider, date: request.date })
+
+        if(existingAppointment && appointmentIsActive(existingAppointment)){
+            return res.status(400).json({success: false, message: "Appointment already exists for the selected date"})
+        }
+    
+        const newAppointment = new Appointment(request)
+        const savedAppointment = await newAppointment.save()
 
         await createAuditLog(req.user ? req.user.id : "system", newAppointment._id, "Appointment", "create", "Appointment created");
 
-        res.status(201).json({success: true, message: "Appointment created successfully"})
+        res.status(201).json({ success: true, message: "Appointment created successfully", data: savedAppointment })
     } catch (error) {
         console.log("Error occured while saving Appointment: ", error.message);
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
