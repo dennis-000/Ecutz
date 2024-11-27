@@ -5,6 +5,7 @@ import { createAuditLog } from './audit.controller.js';
 import fs from 'fs'
 import cloudinary from '../config/cloudinary.config.js';
 import upload from '../config/upload.config.js';
+import path from "path"
 
 export const getAllUsers = async (req, res) => {
     try {
