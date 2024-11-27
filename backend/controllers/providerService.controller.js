@@ -34,13 +34,14 @@ export const getSingleProviderService = async (req, res) => {
 
 export const createNewProviderService = async (req, res) => {
     const request = req.body
+    request.provider = req.user.id
 
     if (!request.provider || !request.service) {
         return res.status(400).json({ success: false, message: "Provider and Service are required" });
     }
 
     try {
-        const existingService = await ProviderService.findOne({ provider: request.provider, service: request.service })
+        const existingService = await ProviderService.findOne({ name: request.name, provider: request.provider, service: request.service })
         if(existingService){
             return res.status(400).json({success: false, message: "Service already exists"})
         }

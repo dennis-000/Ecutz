@@ -25,6 +25,7 @@ const UserSchema = new mongoose.Schema({
   bio: { type: String }, // Provider's bio
   location: { type: String }, // Provider's working location
   averageRating: { type: Number, default: 0 }, // Average rating for provider
+  totalRating: { type: Number, default: 0 }, // Total rating for provider
   verified: {
     type: Boolean,
     default: false, // Indicates if the provider is verified

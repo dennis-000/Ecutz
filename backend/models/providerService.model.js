@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const ProviderServiceSchema = new mongoose.Schema({
+  name: { type: String, required: true },
   provider: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the provider (User)
   service: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true }, // Reference to the general service
   price: { type: Number, required: true }, // Provider's price for the service
