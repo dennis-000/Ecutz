@@ -36,7 +36,7 @@ export const login = async (req, res) => {
         const token = createToken(user._id)
         res.cookie('jwt', token, { httpOnly: true, secure: true, maxAge: 24 * 60 * 60 * 1000 })
         console.log(`User ${ email } logged in successfully`);
-        res.status(200).json({ success: true, message: 'Login successfully', token })
+        res.status(200).json({ success: true, message: 'Login successfully', token , data: user })
     } catch (error) {
         console.log(`Server Error: ${ error.message }`);
         return res.status(500).json({ success: false, message: `Server Error: ${error.message}` })

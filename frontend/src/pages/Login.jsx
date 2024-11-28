@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../config';
 import { toast } from 'react-toastify';
 import {AuthContext} from '../context/AuthContext.jsx'
+import HashLoader from 'react-spinners/BeatLoader';
+
 
 const Login = () => {
 
@@ -12,7 +14,6 @@ const Login = () => {
   });
 
   // loading State
-  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const {dispatch} = useContext(AuthContext)
@@ -40,6 +41,8 @@ const Login = () => {
     
           //=========== LOGICS ===================================
           const result = await res.json()  // Extract message from response
+
+          console.log(result)
     
           // Handle unsuccessful registration
           if(!res.ok){
@@ -50,9 +53,9 @@ const Login = () => {
           dispatch({
             type:'LOGIN_SUCCESS',
             payload:{
-              user:result.data,
+              user:result.data.name,
               token:result.token,
-              role:result.role,
+              role:result.data.role,
             },
           });
 
@@ -108,7 +111,7 @@ const Login = () => {
 
           <div className='mt-7 flex justify-center'>
             <button type='submit' className='w-64 bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3'>
-              Login
+              {loading ? <HashLoader size={25} color='#fff'/> : 'Login'}
             </button>
           </div>
 
@@ -124,4 +127,4 @@ const Login = () => {
   );
 }
 
-export default Login
+export default Login;
