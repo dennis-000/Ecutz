@@ -61,6 +61,7 @@ const Header = () => {
 
   // Function to toggle the visibility of the menu (for mobile view)
   const toggleMenu = () => menuRef.current.classList.toggle('show__menu')
+  console.log(user);
 
   return (
     <header className="header flex items-center" ref={headerRef}>  {/* Header with a reference */}
@@ -105,10 +106,10 @@ const Header = () => {
 
 {token && user ? (
     <div>
-        <Link to={`${role === 'user' ? '/barbers/profile/me' : '/users/profile/me'}`}>
+        <Link to={`${role === 'provider' ? '/barbers/profile/me' : '/users/profile/me'}`}>
             <figure className="w-[35px] rounded-full cursor-pointer">
                 <img 
-                src={user?.photo} 
+                src={user?.profilePicture.url} 
                 className="w-full rounded-full" alt="User Image" />
             </figure>
 

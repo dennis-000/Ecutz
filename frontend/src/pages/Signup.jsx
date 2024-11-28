@@ -48,17 +48,24 @@ const Signup = () => {
   //=========== For Avatar/Profile Picture =========================
   //================================================================
   // Handler for file input changes (profile photo upload)
-  const handleFileInputChange = async (event) => {
-    const file = event.target.files[0];  // Get the first selected file
-    
-    // Upload image to Cloudinary and get back the URL
-    const data = await uploadImageToCloudinary(file);
-    
-    // Update states with the uploaded image URL
-    setPreviewURL(data.url);           // For preview display
-    setSelectedFile(data.url);         // Store selected file
-    setFormData({ ...formData, photo: data.url});  // Update form data with photo URL
-  };
+  // Handler for file input changes (profile photo upload)
+const handleFileInputChange = (event) => {
+  const file = event.target.files[0]; // Get the selected file
+
+  if (file) {
+    // Generate a local preview URL for the selected image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewURL(reader.result); // Set the preview URL for display
+    };
+    reader.readAsDataURL(file);
+
+    // Update the formData with the selected file
+    setSelectedFile(file);
+    setFormData((prevFormData) => ({ ...prevFormData, profilePicture: file }));
+  }
+};
+
   //========================= END ===================================
 
 
@@ -118,6 +125,8 @@ const Signup = () => {
       toast.error(err.message)  // Show error message
       setLoading(false)         // Stop loading state
     }
+
+    console.log(formData.profilePicture);
   };
     
 
@@ -257,7 +266,7 @@ const Signup = () => {
                 <div className='relative w-[130px] h-[50px]'>
                   <input 
                     type="file"
-                    name='photo'
+                    name='profilePicture'
                     id='customFile'
                     onChange={handleFileInputChange}
                     accept='.jpg, .jpeg, .png'
