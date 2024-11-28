@@ -48,7 +48,7 @@ const Signup = () => {
   //=========== For Avatar/Profile Picture =========================
   //================================================================
   // Handler for file input changes (profile photo upload)
-  // Handler for file input changes (profile photo upload)
+  // Handler for file input changes (xprofile photo upload)
 const handleFileInputChange = (event) => {
   const file = event.target.files[0]; // Get the selected file
 
@@ -62,7 +62,6 @@ const handleFileInputChange = (event) => {
 
     // Update the formData with the selected file
     setSelectedFile(file);
-    setFormData((prevFormData) => ({ ...prevFormData, profilePicture: file }));
   }
 };
 
@@ -98,17 +97,26 @@ const handleFileInputChange = (event) => {
     try {
       //must need backend API to fetch
       // Send registration request to backend
+      // Create a FormData object to send the data as multipart/form-data
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('gender', formData.gender);
+      formDataToSend.append('role', formData.role);
+      if (selectedFile) {
+        formDataToSend.append('profilePicture', selectedFile);
+      }
+
       const res = await fetch(`${BASE_URL}users`,{
         method:'post',
-        headers:{
-          'Content-Type':'application/json'
-        },
-        body: JSON.stringify(formData)  // Send form data as JSON
+        body: formDataToSend  // Send form data as JSON
       })
       //======================================================
 
       //=========== LOGICS ===================================
       const{message} = await res.json()  // Extract message from response
+      console.log(res);
 
       // Handle unsuccessful registration
       if(!res.ok){
@@ -126,7 +134,6 @@ const handleFileInputChange = (event) => {
       setLoading(false)         // Stop loading state
     }
 
-    console.log(formData.profilePicture);
   };
     
 
