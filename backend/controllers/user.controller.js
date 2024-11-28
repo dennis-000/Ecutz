@@ -59,7 +59,10 @@ export const getSingleUserById = async (req, res) => {
 export const createNewUser = async (req, res) => {
     try {
         let { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
+        console.log(profilePicture);
         const imagePath = req.file.path
+
+        console.log(imagePath);
 
         const existingUser = await User.findOne({ email })
 
