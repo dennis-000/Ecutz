@@ -26,3 +26,12 @@ export const checkUserPermissions = (req, res, next) => {
       res.status(403).json({ message: 'Forbidden' }); // Block access otherwise
     }
 };
+export const restrict = (roles) => {
+  return (req, res, next) => {
+      // Restriction logic here
+      if (!roles.includes(req.user.role)) {
+          return res.status(403).json({ message: 'Access denied' });
+      }
+      next();
+  };
+};
