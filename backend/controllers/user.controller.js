@@ -60,9 +60,6 @@ export const createNewUser = async (req, res) => {
     try {
         let { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
         console.log(profilePicture);
-        const imagePath = req.file.path
-
-        console.log(imagePath);
 
         const existingUser = await User.findOne({ email })
 
@@ -72,14 +69,19 @@ export const createNewUser = async (req, res) => {
         
         const hash = await hashPassword(password)
 
-        // Upload image to Cloudinary with a specified folder
-        const result = await cloudinary.uploader.upload(imagePath, {
+        if(req.file){
+            console.log(req.file.path);
+            const imagePath = req.file.path
+            console.log(imagePath);
+            // Upload image to Cloudinary with a specified folder
+            const result = await cloudinary.uploader.upload(imagePath, {
             folder: 'ecutz/profilePictures'  // Specify your folder here
-        });
+            });
 
-        profilePicture = {
-            url: result.secure_url,
-            public_id: result.public_id
+            profilePicture = {
+                url: result.secure_url,
+                public_id: result.public_id
+            }
         }
 
         const newUser = new User({
@@ -95,7 +97,7 @@ export const createNewUser = async (req, res) => {
 
         const newCreatedUser = await newUser.save()
 
-        fs.unlinkSync(imagePath);
+        fs.unlinkSync(req.file.path);
         console.log(req.user);
 
         await createAuditLog(req.user ? req.user.id : "system", newCreatedUser._id, "User", "create", "New User was created"); //Log user creation
