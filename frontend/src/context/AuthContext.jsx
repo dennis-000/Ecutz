@@ -41,13 +41,18 @@ const authReducer = (state, action) => {
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
+    // Update localStorage when state changes
     useEffect(() => {
-        if (state.token) {
+        if (state.user) {
             localStorage.setItem('user', JSON.stringify(state.user));
+        }
+        if (state.role) {
             localStorage.setItem('role', state.role);
+        }
+        if (state.token) {
             localStorage.setItem('token', state.token);
         }
-    }, [state]);
+    }, [state.user, state.role, state.token]);
 
     return (
         <AuthContext.Provider

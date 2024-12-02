@@ -97,7 +97,9 @@ export const createNewUser = async (req, res) => {
 
         const newCreatedUser = await newUser.save()
 
-        fs.unlinkSync(req.file.path);
+        if (req.file) {
+            fs.unlinkSync(req.file.path);
+        }
         console.log(req.user);
 
         await createAuditLog(req.user ? req.user.id : "system", newCreatedUser._id, "User", "create", "New User was created"); //Log user creation
