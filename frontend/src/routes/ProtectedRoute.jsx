@@ -6,6 +6,8 @@ import { Navigate } from "react-router-dom";
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { token, role } = useContext(AuthContext);
 
+
+
     // Debugging token and role
     console.log('ProtectedRoute:', { token, role, allowedRoles });
 
@@ -14,10 +16,14 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         return <div>Loading...</div>;
     }
 
+
+
     // Check if the user is allowed
     const isAllowed = token && allowedRoles.includes(role);
 
-    return isAllowed ? children : <Navigate to="/login" replace={true} />;
+    const accessibleRoute = token && isAllowed ? children : <Navigate to="/login" replace={true} />;
+
+    return accessibleRoute
 };
 
 export default ProtectedRoute;
