@@ -1,11 +1,12 @@
 import userImg from '../../assets/images/barber-img01.jpg';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
 
 const MyAccount = () => {
 
   const {dispatch} = useContext (AuthContext)
+  const [tab,setTab] = useState ('bookings')
 
   const handleLogout = ()=>{
     dispatch({type:'LOGOUT'})
@@ -53,16 +54,25 @@ const MyAccount = () => {
 
         <div className='md:col-span-2 md:px-[30px]'>
           <div>
-            <button className='p-2 mr-5 px-5 rounded-md text-headingColor font-semibold text-[16px]
-            leading-7 border border-solid border-primaryColor'>
+          <button 
+              onClick={() => setTab('appointments')} 
+              className={`p-2 mr-5 px-5 rounded-md text-headingColor font-semibold text-[16px] 
+              leading-7 border border-solid border-primaryColor ${
+                tab === 'appointments' ? 'bg-primaryColor text-white font-normal' : ''
+              }`}>
               My Bookings
-              </button>
+            </button>
             
-            <button className='py-2 px-5 rounded-md text-headingColor  font-semibold text-[16px]
-            leading-7 border border-solid border-primaryColor'>
+            <button 
+              onClick={() => setTab('settings')} 
+              className={`py-2 px-5 rounded-md text-headingColor font-semibold text-[16px]
+              leading-7 border border-solid border-primaryColor ${
+                tab === 'settings' ? 'bg-primaryColor text-white font-normal' : ''
+              }`}>
               Profile Settings
-              </button>
+            </button>
           </div>
+          
         </div>
       </div>
     </div>
