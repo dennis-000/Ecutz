@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables
 
-// // Check if CLOUDINARY_URL exists
+// Check if CLOUDINARY_URL exists
 // if (!process.env.CLOUDINARY_CLOUD_NAME) {
 //   throw new Error('CLOUDINARY_CLUDNAME is not set in .env file');
 // }

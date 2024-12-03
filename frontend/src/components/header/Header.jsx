@@ -109,8 +109,8 @@ const Header = () => {
         <Link to={`${role === 'provider' ? '/barbers/profile/me' : '/users/profile/me'}`}>
             <figure className="w-[35px] rounded-full cursor-pointer">
                 <img 
-                src={user?.profilePicture.url} 
-                className="w-full rounded-full" alt="User Image" />
+                    src={user?.profilePicture?.ur} 
+                    className="w-full rounded-full" alt="User Image" />
             </figure>
 
         </Link>

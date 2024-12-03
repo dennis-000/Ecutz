@@ -7,11 +7,14 @@ import Contact from '../pages/Contact'
 import Barbers from '../pages/Barbers/Barbers'
 import BarbersDetails from '../pages/Barbers/BarbersDetails'
 import Aboutus from '../pages/Aboutus'
-
+import Dashboard from '../Dashboard/Barber-account/Dashboard'
 import {Routes, Route} from 'react-router-dom'
+import ProtectedRoute from './ProtectedRoute'
+import MyAccount from '../Dashboard/user-account/MyAccount'
 
 const Routers = () => {
-  return <Routes>
+  return (
+  <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/home" element={<Home />} />
     <Route path="/barbers" element={<Barbers />} />
@@ -21,9 +24,29 @@ const Routers = () => {
     <Route path="/contact" element={<Contact />} />
     <Route path="/services" element={<Services />} />
     <Route path="/aboutus" element={<Aboutus />} />
+
+    <Route 
+    path="/users/profile/me" 
+    element={
+      <ProtectedRoute allowedRoles={['customer']} >
+        <MyAccount />
+      </ProtectedRoute> 
+    } 
+    />
+
+    <Route 
+    path="/barber/profile/me" 
+    element={
+      <ProtectedRoute allowedRoles={['barber']}>
+        <Dashboard />
+      </ProtectedRoute>
+    } 
+    />
     
 
   </Routes>
-}
+  )
+};
 
-export default Routers
+
+export default Routers;

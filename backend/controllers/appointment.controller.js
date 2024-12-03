@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import Appointment from "../models/appointment.model.js";
 import { appointmentIsActive } from "../server.js";
 import { createAuditLog } from "./audit.controller.js";
+import AppointmentSchema from '../models/appointment.model.js';
+import ProviderService from '../models/providerService.model.js';
+
 
 export const getAllAppointments = async (req, res) => {
     try {
@@ -100,3 +103,29 @@ export const deleteAppointment = async (req, res) => {
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
     }
 }
+
+export const getMyAppointments = async(req,res)=>{
+    try{
+        //retrieving appointments from booking for specific user
+        const appointments = await AppointmentSchema.find({ user:req.userId })
+
+        //extract provider id from appointment bookings
+        const providerIds = appointments.map(el=>el.provider.id)
+
+        //retrieve providers using their ids
+        const providers = await ProviderService.find({_id: {$in:providerIds}}).select('-password');
+
+        res
+        .status(200)
+        .json({
+            success: true,
+            message: "Appointments are getting",
+            data: providers,})
+          }  catch (err) {
+            res
+                .status(500)
+                .json({
+                    success: false, 
+                    message:"Something went wrong, cannot get"});
+        }
+    }

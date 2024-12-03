@@ -1,8 +1,8 @@
 import { createContext, useEffect, useReducer } from "react";
 
-// Initial state setup with proper parsing and validation for localStorage values
+// Initial state setup
 const initialState = {
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null, // Safely parse user data
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
     role: localStorage.getItem('role') || null,
     token: localStorage.getItem('token') || null,
 };
@@ -17,7 +17,7 @@ const authReducer = (state, action) => {
             return {
                 user: null,
                 role: null,
-                token: null
+                token: null,
             };
         case 'LOGIN_SUCCESS':
             return {
@@ -26,41 +26,41 @@ const authReducer = (state, action) => {
                 role: action.payload.role,
             };
         case 'LOGOUT':
-            // Remove data from localStorage upon logout
-            localStorage.removeItem('user');
-            localStorage.removeItem('role');
-            localStorage.removeItem('token');
+            localStorage.clear(); // Clear all localStorage items
             return {
                 user: null,
                 role: null,
-                token: null
+                token: null,
             };
         default:
             return state;
     }
 };
 
-// AuthContextProvider component to provide global state to children
+// AuthContextProvider
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
-    // useEffect to update localStorage whenever the state changes
+    // Update localStorage when state changes
     useEffect(() => {
-        // Only update localStorage if the user data exists
         if (state.user) {
             localStorage.setItem('user', JSON.stringify(state.user));
         }
-        localStorage.setItem('token', state.token);
-        localStorage.setItem('role', state.role);
-    }, [state]); // Run when state changes
+        if (state.role) {
+            localStorage.setItem('role', state.role);
+        }
+        if (state.token) {
+            localStorage.setItem('token', state.token);
+        }
+    }, [state.user, state.role, state.token]);
 
     return (
-        <AuthContext.Provider 
+        <AuthContext.Provider
             value={{
                 user: state.user,
                 token: state.token,
                 role: state.role,
-                dispatch
+                dispatch,
             }}
         >
             {children}

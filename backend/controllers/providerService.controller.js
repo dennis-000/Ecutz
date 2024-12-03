@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ProviderService from "../models/providerService.model.js";
 import { createAuditLog } from "./audit.controller.js";
+import Appointment from "../models/appointment.model.js";
 
 export const getAllProviderService =  async (req, res) => {
     try {
@@ -101,5 +102,28 @@ export const deleteProviderService = async (req, res) => {
     } catch (error) {
         console.log(`Error occurred while deleting service: ${error.message}`)
         return res.status(500).json({success: false, message: `Server Error: ${error.message}`})
+    }
+}
+
+export const getProviderProfile = async(req,res)=>{
+    const providerId = req.userId
+
+    try {
+        const provider = await Provider.findById(providerId)
+
+        if (!provider){
+            return res.status(404).json({success: false, message: 'Provider not found'})
+        }
+
+        const {password, ...rest} = provider._doc
+        const appointments = await Appointment.find({provider:providerId})
+
+        res.status(200).json({ success: true, 
+            message: 'Profile information retrieved successfully', 
+            data: { ...rest, appointments },
+         });
+    } catch(err) {
+        res.status(500)
+        .json({success: false, message:"Something went wrong, cannot get"})
     }
 }
