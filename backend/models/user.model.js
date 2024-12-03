@@ -41,6 +41,12 @@ const UserSchema = new mongoose.Schema({
   permissions: {
     type: [String], // Admins and superadmins can have permissions like ["manageUsers", "manageServices", etc.]
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date
+  }
 }, { timestamps: true }); // Automatically adds `createdAt` and `updatedAt` timestamps
 
 const User = mongoose.model("User", UserSchema);
