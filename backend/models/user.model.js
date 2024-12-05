@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
     enum: ["customer", "provider", "admin", "superadmin"], // Added "superadmin"
     default: "customer",
   },
+  gender: { type: String, },
   phone: { type: String },
   profilePicture: {
     url: { type: String },

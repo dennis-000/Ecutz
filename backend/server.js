@@ -23,7 +23,14 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
-app.use(cors())
+
+const corsOptions = {
+    origin: true, // Allow requests from your frontend
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Include PATCH
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
+  };
+app.use('*', cors(corsOptions))
 
 app.use(express.json()) //allows us to accept json data in the req.body
 app.use(cookieParser());
@@ -35,7 +42,7 @@ app.use("/api/provider-services", providerServiceRouter)
 app.use("/api/audit-logs", auditRouter)
 app.use("/api/appointments", appointmentRouter)
 app.use("/api", loginRouter)
-app.use("/api/users", galleryRouter)
+app.use("/api/users/gallery", galleryRouter)
 app.use("/api/rating", ratingRouter)
 
 //cron job

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createAppointment, deleteAppointment, getAllAppointments, getSingleAppointment, updateAppointment } from "../controllers/appointment.controller.js";
+import { createAppointment, deleteAppointment, getAllAppointments, getSingleAppointment, getUserAppointments, updateAppointment } from "../controllers/appointment.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 
 const appointmentRouter = Router()
@@ -7,6 +7,7 @@ const appointmentRouter = Router()
 //Appointment
 appointmentRouter.get("/", getAllAppointments)
 appointmentRouter.get("/:id", getSingleAppointment)//Get a single appointment
+appointmentRouter.get("/", getUserAppointments)//Get a single appointment
 appointmentRouter.post("/", requireAuth, createAppointment)
 appointmentRouter.patch("/:id",requireAuth, updateAppointment)
 appointmentRouter.delete("/:id",requireAuth, deleteAppointment)
