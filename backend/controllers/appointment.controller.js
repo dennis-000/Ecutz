@@ -103,27 +103,27 @@ export const deleteAppointment = async (req, res) => {
     }
 }
 
-export const getUserAppointments = async(req,res)=>{
-    
-    try{
-        //retrieving appointments from booking for specific user
-        const appointments = await Appointment.find({ user:req.user.id })
+export const getUserAppointments = async(req,res) => {
+    try {
+        // Ensure you're using 'customer' instead of 'user'
+        const appointments = await Appointment.find({ customer: req.user.id })
 
-        if(!appointments){
-            return res.status(404).json({ success: false, message: "No appointments found" });
+        if(!appointments || appointments.length === 0){
+            return res.status(404).json({ 
+                success: false, 
+                message: "No appointments found" 
+            });
         }
 
-        res
-        .status(200)
-        .json({
+        res.status(200).json({
             success: true,
             message: "Appointments fetched successfully",
-            data: appointments,})
-          }  catch (err) {
-            res
-                .status(500)
-                .json({
-                    success: false, 
-                    message:"Something went wrong, cannot get user appointments "});
-        }
+            data: appointments
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false, 
+            message: "Something went wrong, cannot get user appointments"
+        });
     }
+}

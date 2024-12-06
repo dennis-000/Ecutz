@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
-import MyAppoinments from './MyAppointments';
+import MyAppointments from './MyAppointments';
 import Profile from './Profile';
 
 import useGetProfile from '../../hooks/useFetchData';
@@ -110,7 +110,7 @@ const MyAccount = () => {
           </div>
 
           {
-          tab ==='bookings' && <MyAppoinments  />
+          tab ==='bookings' && <MyAppointments/>
           }
           {
             tab==='settings' && <Profile user={userData}/>
