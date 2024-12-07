@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import Appointment from "../models/appointment.model.js";
 import { appointmentIsActive } from "../server.js";
 import { createAuditLog } from "./audit.controller.js";
-import AppointmentSchema from '../models/appointment.model.js';
 import ProviderService from '../models/providerService.model.js';
 
 
@@ -104,28 +103,27 @@ export const deleteAppointment = async (req, res) => {
     }
 }
 
-export const getMyAppointments = async(req,res)=>{
-    try{
-        //retrieving appointments from booking for specific user
-        const appointments = await AppointmentSchema.find({ user:req.userId })
+export const getUserAppointments = async(req,res) => {
+    try {
+        // Ensure you're using 'customer' instead of 'user'
+        const appointments = await Appointment.find({ customer: req.user.id })
 
-        //extract provider id from appointment bookings
-        const providerIds = appointments.map(el=>el.provider.id)
-
-        //retrieve providers using their ids
-        const providers = await ProviderService.find({_id: {$in:providerIds}}).select('-password');
-
-        res
-        .status(200)
-        .json({
-            success: true,
-            message: "Appointments are getting",
-            data: providers,})
-          }  catch (err) {
-            res
-                .status(500)
-                .json({
-                    success: false, 
-                    message:"Something went wrong, cannot get"});
+        if(!appointments || appointments.length === 0){
+            return res.status(404).json({ 
+                success: false, 
+                message: "No appointments found" 
+            });
         }
+
+        res.status(200).json({
+            success: true,
+            message: "Appointments fetched successfully",
+            data: appointments
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false, 
+            message: "Something went wrong, cannot get user appointments"
+        });
     }
+}
