@@ -58,7 +58,7 @@ export const getSingleUserById = async (req, res) => {
 
 export const createNewUser = async (req, res) => {
     try {
-        let { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
+        let { name, email, password, role, phone, location, verified, status, profilePicture, gender } = req.body
         console.log(profilePicture);
 
         const existingUser = await User.findOne({ email })
@@ -89,6 +89,7 @@ export const createNewUser = async (req, res) => {
             email,
             password: hash,
             role,
+            gender,
             phone,
             location,
             status: role === "provider" ? "inactive" : "active",
@@ -142,7 +143,7 @@ export const updateUser = async (req, res) => {
     try{
     const { id } = req.params
 
-    let { name, email, password, role, phone, location, verified, status, profilePicture } = req.body
+    let { name, email, password, gender, role, phone, location, verified, status, profilePicture, bio } = req.body
 
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({success:false, message: "Invalid User ID"})
@@ -192,8 +193,10 @@ export const updateUser = async (req, res) => {
         email: email || user.email,
         password: hash,
         role: role || user.role,
+        gender: gender || user.gender,
         phone: phone || user.phone,
         location: location || user.location,
+        bio: bio || user.bio,
         status: status || user.status,
         verified: verified || user.verified,
         profilePicture: req.file ? updatedProfilePic : profilePicture,

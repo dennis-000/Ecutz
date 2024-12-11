@@ -11,7 +11,7 @@ import {
 } from '../controllers/user.controller.js'
 import upload from '../config/upload.config.js';
 import { requireAuth, restrict } from '../middlewares/auth.middleware.js';
-import { getMyAppointments } from '../controllers/appointment.controller.js';
+// import { getMyAppointments } from '../controllers/appointment.controller.js';
 
 const userRouter = Router()
 
@@ -29,6 +29,6 @@ userRouter.delete("/:id",requireAuth, deleteUser)
 
 //get all appointments on the user dashboard
 userRouter.get("/profile/me", requireAuth, restrict(["user"]), getUserProfile);
-userRouter.get("/appointments/my-appointments", requireAuth, restrict(["user"]), getMyAppointments);
+// userRouter.get("/appointments/my-appointments", requireAuth, restrict(["user"]), getMyAppointments);
 
 export default userRouter;
